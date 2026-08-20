@@ -28,3 +28,24 @@ function isAdminLoggedIn(): bool
 
     return isset($_SESSION['admin_id']);
 }
+
+/**
+ * Zwalnia blokadę pliku sesji, jeśli sesja jest otwarta.
+ *
+ * PHP trzyma wyłączną blokadę pliku sesji od session_start() aż do końca
+ * requestu, przez co równoległe żądania tego samego klienta ustawiają się
+ * w kolejce. Publiczne odczyty w API tylko sprawdzają flagę admina i nic do
+ * sesji nie zapisują, więc mogą oddać blokadę od razu po tym sprawdzeniu.
+ *
+ * Po wywołaniu $_SESSION pozostaje czytelne, ale dalsze zapisy nie będą
+ * utrwalone — stąd wyłącznie dla ścieżek tylko do odczytu.
+ *
+ * Zamyka sesję tylko gdy jest aktywna: session_write_close() na nieaktywnej
+ * sesji emituje warning, który zepsułby odpowiedź JSON.
+ */
+function releaseSessionLock(): void
+{
+    if (session_status() === PHP_SESSION_ACTIVE) {
+        session_write_close();
+    }
+}

@@ -33,7 +33,13 @@ switch ($method) {
 
 function handleGet(PDO $pdo): void
 {
-    if (isAdminLoggedIn()) {
+    $isAdmin = isAdminLoggedIn();
+
+    // Dalej już tylko czytamy z bazy — blokada pliku sesji nie jest potrzebna
+    // i niepotrzebnie serializowałaby równoległe publiczne odczyty.
+    releaseSessionLock();
+
+    if ($isAdmin) {
         $stmt = $pdo->query('SELECT * FROM opinions ORDER BY created_at DESC, id DESC');
     } else {
         $stmt = $pdo->query('SELECT * FROM opinions WHERE is_published = 1 ORDER BY created_at DESC, id DESC');

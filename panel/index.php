@@ -13,372 +13,800 @@ if (!isset($_SESSION['admin_id'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Panel administracyjny</title>
+    <title>Panel administracyjny — Pani Matcha</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..600&family=Manrope:wght@400..800&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --matcha-50: #f4f8ee;
+            --matcha-100: #e6f0d8;
+            --matcha-200: #cfe2b4;
+            --matcha-300: #b4d18c;
+            --matcha-500: #7ba64c;
+            --matcha-600: #5f8639;
+            --matcha-700: #48682e;
+            --matcha-800: #354d26;
+            --matcha-900: #24361c;
+
+            --cream-50: #fffdf8;
+            --cream-100: #fbf7ee;
+            --cream-200: #f4ecdc;
+
+            --clay-400: #c8b8a0;
+            --clay-600: #8a7a63;
+            --clay-800: #4b4234;
+
+            --gold-400: #d9b86a;
+            --gold-500: #c19a45;
+
+            --red-500: #dc2626;
+            --red-50: #fef2f2;
+            --green-600: #16a34a;
+            --green-50: #f0fdf4;
+
+            --radius: 12px;
+            --shadow-sm: 0 1px 2px rgba(36, 54, 28, 0.06);
+            --shadow-md: 0 8px 24px -8px rgba(36, 54, 28, 0.16);
+            --font-display: 'Fraunces', Georgia, serif;
+            --font-sans: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+        }
+
         * { box-sizing: border-box; }
+
+        html { -webkit-text-size-adjust: 100%; }
+
         body {
-            font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+            font-family: var(--font-sans);
             margin: 0;
-            padding: 24px;
-            background: #f5f5f7;
-            color: #222;
+            background: var(--cream-100);
+            color: var(--matcha-900);
+            -webkit-font-smoothing: antialiased;
         }
-        h1 { margin-top: 0; }
-        h2 { margin-bottom: 12px; }
-        .top-bar {
+
+        h1, h2, h3 { font-family: var(--font-display); font-weight: 600; }
+        h1 { margin: 0; font-size: 1.5rem; }
+        h2 { margin: 0; font-size: 1.15rem; }
+        h3 { margin: 0 0 4px; font-size: 1.05rem; color: var(--matcha-800); }
+
+        a { color: var(--matcha-700); }
+
+        ::selection { background: var(--matcha-200); color: var(--matcha-900); }
+
+        :focus-visible {
+            outline: 2px solid var(--matcha-600);
+            outline-offset: 2px;
+            border-radius: 4px;
+        }
+
+        /* ---------- App shell: sidebar + content ---------- */
+
+        .app-shell {
             display: flex;
-            justify-content: space-between;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            flex: 0 0 240px;
+            display: flex;
+            flex-direction: column;
+            background: var(--matcha-900);
+            color: var(--cream-100);
+            padding: 24px 18px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .brand {
+            display: flex;
             align-items: center;
-            margin-bottom: 24px;
+            gap: 10px;
+            padding: 4px 8px 20px;
+            margin-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .panel {
-            background: #fff;
-            border: 1px solid #ddd;
+
+        .brand-mark {
+            display: grid;
+            place-items: center;
+            width: 34px;
+            height: 34px;
+            border-radius: 999px;
+            background: var(--matcha-500);
+            color: var(--cream-50);
+            flex-shrink: 0;
+        }
+
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+        }
+
+        .brand-text strong {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            color: var(--cream-50);
+        }
+
+        .brand-text span {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--matcha-300);
+        }
+
+        .section-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            margin: 12px 0;
+            padding: 0;
+            flex: 1;
+        }
+
+        .section-nav a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 10px;
             border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 24px;
+            color: var(--matcha-100);
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 500;
+            transition: background-color 0.15s ease, color 0.15s ease;
         }
+
+        .section-nav a:hover,
+        .section-nav a:focus-visible {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--cream-50);
+        }
+
+        .section-nav svg { flex-shrink: 0; opacity: 0.85; }
+
+        .sidebar-footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 14px;
+            margin-top: 8px;
+        }
+
+        .logout-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 10px;
+            border-radius: 8px;
+            color: var(--matcha-200);
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 500;
+            transition: background-color 0.15s ease, color 0.15s ease;
+        }
+
+        .logout-link:hover { background: rgba(255, 255, 255, 0.08); color: var(--cream-50); }
+
+        .main { flex: 1; min-width: 0; }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 22px 32px;
+            background: var(--cream-50);
+            border-bottom: 1px solid rgba(53, 77, 38, 0.08);
+            position: sticky;
+            top: 0;
+            z-index: 5;
+        }
+
+        .topbar p {
+            margin: 3px 0 0;
+            font-size: 13px;
+            color: var(--clay-600);
+        }
+
+        .content {
+            padding: 28px 32px 64px;
+            max-width: 1080px;
+        }
+
+        /* ---------- Panels / cards ---------- */
+
+        .panel {
+            background: var(--cream-50);
+            border: 1px solid rgba(53, 77, 38, 0.08);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            padding: 24px;
+            margin-bottom: 22px;
+            scroll-margin-top: 90px;
+        }
+
+        .panel-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 4px;
+        }
+
+        .panel-icon {
+            display: grid;
+            place-items: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: var(--matcha-100);
+            color: var(--matcha-700);
+            flex-shrink: 0;
+        }
+
+        .panel-hint {
+            margin: 4px 0 18px;
+            font-size: 13px;
+            color: var(--clay-600);
+        }
+
+        /* ---------- Forms ---------- */
+
         form.inline-form {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 14px;
             align-items: flex-end;
         }
+
         form.inline-form label {
             display: flex;
             flex-direction: column;
-            font-size: 13px;
-            gap: 4px;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--matcha-800);
+            gap: 6px;
+            flex: 1 1 170px;
         }
+
+        form.inline-form label:has(input[type="checkbox"]) {
+            flex-direction: row;
+            align-items: center;
+            flex: 0 0 auto;
+            font-weight: 500;
+            padding-bottom: 9px;
+        }
+
         input, select, textarea {
-            padding: 6px 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            padding: 9px 11px;
+            border: 1px solid rgba(53, 77, 38, 0.18);
+            border-radius: 8px;
             font-size: 14px;
+            font-family: inherit;
+            background: var(--cream-50);
+            color: var(--matcha-900);
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
         }
-        textarea { min-height: 60px; resize: vertical; }
+
+        input:hover, select:hover, textarea:hover { border-color: rgba(53, 77, 38, 0.32); }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--matcha-500);
+            box-shadow: 0 0 0 3px rgba(123, 166, 76, 0.18);
+        }
+
+        input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--matcha-600);
+            padding: 0;
+        }
+
+        input[type="file"] { padding: 7px; font-size: 13px; }
+
+        textarea { min-height: 68px; resize: vertical; }
+
+        /* ---------- Buttons ---------- */
+
         button {
-            padding: 7px 14px;
+            padding: 9px 18px;
             border: none;
-            border-radius: 4px;
-            background: #2563eb;
-            color: #fff;
+            border-radius: 999px;
+            background: var(--matcha-700);
+            color: var(--cream-50);
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13.5px;
+            font-weight: 600;
+            font-family: inherit;
+            transition: background-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
         }
-        button.secondary { background: #6b7280; }
-        button.danger { background: #dc2626; }
-        button:hover { opacity: 0.9; }
+
+        button:hover { background: var(--matcha-600); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+        button:active { transform: translateY(0); }
+
+        button.secondary {
+            background: transparent;
+            color: var(--clay-800);
+            border: 1px solid rgba(53, 77, 38, 0.2);
+        }
+        button.secondary:hover { background: var(--matcha-50); box-shadow: none; }
+
+        button.danger { background: var(--red-500); }
+        button.danger:hover { background: #b91c1c; }
+
+        /* ---------- Status messages ---------- */
+
+        .status-msg {
+            font-size: 13px;
+            margin-top: 10px;
+            min-height: 1.2em;
+            font-weight: 600;
+        }
+        .status-msg.error { color: var(--red-500); }
+        .status-msg.success { color: var(--green-600); }
+
+        /* ---------- Tables ---------- */
+
+        .table-wrap { overflow-x: auto; margin-top: 14px; border-radius: 10px; }
+
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 12px;
+            font-size: 13.5px;
         }
+
         th, td {
             text-align: left;
-            padding: 8px;
-            border-bottom: 1px solid #eee;
+            padding: 11px 10px;
+            border-bottom: 1px solid rgba(53, 77, 38, 0.08);
             vertical-align: middle;
         }
-        th { font-size: 13px; color: #666; }
+
+        th {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--clay-600);
+            font-weight: 700;
+            background: var(--matcha-50);
+        }
+
+        th:first-child { border-top-left-radius: 10px; }
+        th:last-child { border-top-right-radius: 10px; }
+
+        tbody tr:hover { background: var(--matcha-50); }
+        tbody tr:last-child td { border-bottom: none; }
+
+        td.actions { display: flex; flex-wrap: wrap; gap: 6px; }
+        td.actions button { padding: 6px 13px; font-size: 12.5px; }
+
         img.thumb {
             width: 48px;
             height: 48px;
             object-fit: cover;
-            border-radius: 4px;
-            background: #eee;
+            border-radius: 8px;
+            background: var(--matcha-100);
+            display: block;
         }
-        .actions button { margin-right: 6px; }
-        .category-group { margin-top: 20px; }
+        div.thumb {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            background: var(--matcha-50);
+            border: 1px dashed rgba(53, 77, 38, 0.25);
+        }
+
+        .category-group { margin-top: 26px; }
+        .category-group:first-child { margin-top: 8px; }
         .category-group h3 {
-            margin-bottom: 4px;
-            border-bottom: 2px solid #2563eb;
+            display: inline-block;
+            border-bottom: 2px solid var(--gold-500);
             padding-bottom: 4px;
         }
-        .status-msg { font-size: 13px; margin-top: 8px; }
-        .status-msg.error { color: #dc2626; }
-        .status-msg.success { color: #16a34a; }
-        .unavailable { opacity: 0.5; }
+
+        .unavailable { opacity: 0.55; }
+
         .badge {
             display: inline-block;
             font-size: 11px;
-            padding: 2px 6px;
-            border-radius: 10px;
-            background: #eee;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 999px;
+            background: var(--matcha-50);
+            color: var(--clay-600);
         }
-        .badge.available { background: #dcfce7; color: #166534; }
-        .badge.unavailable { background: #fee2e2; color: #991b1b; }
+        .badge.available, .badge.published { background: var(--green-50); color: var(--green-600); }
+        .badge.unavailable, .badge.hidden { background: var(--red-50); color: var(--red-500); }
+
+        .rating-stars { color: var(--gold-500); letter-spacing: 1px; font-size: 15px; }
+
+        /* ---------- Gallery ---------- */
+
         .gallery-grid {
             display: flex;
             flex-wrap: wrap;
-            gap: 14px;
-            margin-top: 12px;
+            gap: 16px;
+            margin-top: 16px;
         }
         .gallery-item {
-            width: 160px;
-            border: 1px solid #eee;
-            border-radius: 8px;
-            padding: 8px;
+            width: 168px;
+            border: 1px solid rgba(53, 77, 38, 0.1);
+            border-radius: 12px;
+            padding: 10px;
             text-align: center;
+            background: var(--cream-50);
+            box-shadow: var(--shadow-sm);
         }
         .gallery-item img.thumb-lg {
             width: 100%;
             height: 120px;
             object-fit: cover;
-            border-radius: 4px;
-            background: #eee;
+            border-radius: 8px;
+            background: var(--matcha-100);
+            display: block;
+        }
+        div.thumb-lg {
+            width: 100%;
+            height: 120px;
+            border-radius: 8px;
+            background: var(--matcha-50);
+            border: 1px dashed rgba(53, 77, 38, 0.25);
         }
         .gallery-item .caption {
             font-size: 13px;
-            margin: 6px 0;
+            margin: 8px 0;
             word-break: break-word;
+            min-height: 1.2em;
         }
         .gallery-item .actions {
             display: flex;
             justify-content: center;
             gap: 6px;
         }
-        .section-nav {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 24px;
+        .gallery-item .actions button { padding: 6px 12px; font-size: 12px; }
+
+        /* ---------- Responsive ---------- */
+
+        @media (max-width: 880px) {
+            .app-shell { flex-direction: column; }
+            .sidebar {
+                position: static;
+                height: auto;
+                flex-direction: row;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 8px 16px;
+                padding: 14px 18px;
+            }
+            .brand { border-bottom: none; padding: 0; margin: 0; }
+            .section-nav { flex-direction: row; flex-wrap: wrap; margin: 0; flex: 1; }
+            .sidebar-footer { border-top: none; padding-top: 0; margin-top: 0; }
+            .topbar, .content { padding-left: 18px; padding-right: 18px; }
         }
-        .section-nav a {
-            padding: 6px 12px;
-            border-radius: 999px;
-            background: #fff;
-            border: 1px solid #ddd;
-            color: #2563eb;
-            text-decoration: none;
-            font-size: 13px;
+
+        @media (max-width: 560px) {
+            form.inline-form label { flex-basis: 100%; }
         }
-        .section-nav a:hover { background: #eef2ff; }
-        .rating-stars { color: #f59e0b; letter-spacing: 1px; }
-        .badge.published { background: #dcfce7; color: #166534; }
-        .badge.hidden { background: #fee2e2; color: #991b1b; }
     </style>
 </head>
 <body>
-    <div class="top-bar">
-        <h1>Panel administracyjny — menu</h1>
-        <p><a href="logout.php">Wyloguj</a></p>
-    </div>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="brand">
+                <span class="brand-mark" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <path d="M4 9h13a3 3 0 0 1 0 6h-1" stroke-linecap="round" />
+                        <path d="M4 9v3a5 5 0 0 0 5 5h3a5 5 0 0 0 5-5V9" stroke-linecap="round" />
+                    </svg>
+                </span>
+                <span class="brand-text">
+                    <strong>Pani Matcha</strong>
+                    <span>Panel administracyjny</span>
+                </span>
+            </div>
 
-    <nav class="section-nav">
-        <a href="#section-categories">Kategorie</a>
-        <a href="#section-products">Produkty</a>
-        <a href="#section-gallery">Galeria</a>
-        <a href="#section-events">Wydarzenia</a>
-        <a href="#section-opinions">Opinie</a>
-        <a href="#section-settings">Ustawienia</a>
-    </nav>
+            <nav class="section-nav">
+                <a href="#section-categories">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16M4 12h16M4 18h9" stroke-linecap="round" /></svg>
+                    Kategorie
+                </a>
+                <a href="#section-products">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 7 12 3 4 7v10l8 4 8-4V7Z" stroke-linejoin="round" /><path d="M4 7l8 4 8-4M12 11v10" stroke-linejoin="round" /></svg>
+                    Produkty
+                </a>
+                <a href="#section-gallery">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2" /><circle cx="8.5" cy="9.5" r="1.5" /><path d="m4 17 5-5 4 4 3-3 4 4" stroke-linejoin="round" /></svg>
+                    Galeria
+                </a>
+                <a href="#section-events">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M8 3v4M16 3v4M3 10h18" stroke-linecap="round" /></svg>
+                    Wydarzenia
+                </a>
+                <a href="#section-opinions">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8L12 1.6z" stroke-linejoin="round" /></svg>
+                    Opinie
+                </a>
+                <a href="#section-settings">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3.2" /><path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l2-1.5-2-3.4-2.3.9a7.7 7.7 0 0 0-2.6-1.5L14 2.5h-4l-.5 2.5a7.7 7.7 0 0 0-2.6 1.5l-2.3-.9-2 3.4 2 1.5a7.6 7.6 0 0 0 0 3l-2 1.5 2 3.4 2.3-.9c.75.66 1.63 1.17 2.6 1.5l.5 2.5h4l.5-2.5a7.7 7.7 0 0 0 2.6-1.5l2.3.9 2-3.4-2-1.5Z" stroke-linejoin="round" /></svg>
+                    Ustawienia
+                </a>
+            </nav>
 
-    <div class="panel" id="section-categories">
-        <h2 id="category-form-title">Dodaj kategorię</h2>
-        <form id="category-form" class="inline-form">
-            <input type="hidden" id="category-id" value="">
-            <label>
-                Nazwa
-                <input type="text" id="category-name" required>
-            </label>
-            <label>
-                Kolejność
-                <input type="number" id="category-sort-order" value="0">
-            </label>
-            <button type="submit">Zapisz</button>
-            <button type="button" class="secondary" id="category-form-cancel" style="display:none;">Anuluj edycję</button>
-        </form>
-        <div id="category-status" class="status-msg"></div>
+            <div class="sidebar-footer">
+                <a href="logout.php" class="logout-link">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 17l5-5-5-5M20 12H9M12 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                    Wyloguj
+                </a>
+            </div>
+        </aside>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Nazwa</th>
-                    <th>Kolejność</th>
-                    <th>Akcje</th>
-                </tr>
-            </thead>
-            <tbody id="categories-table-body"></tbody>
-        </table>
-    </div>
+        <div class="main">
+            <header class="topbar">
+                <div>
+                    <h1>Panel administracyjny</h1>
+                    <p>Zarządzaj treścią strony panimatcha.pl</p>
+                </div>
+            </header>
 
-    <div class="panel" id="section-products">
-        <h2 id="product-form-title">Dodaj produkt</h2>
-        <form id="product-form" class="inline-form" enctype="multipart/form-data">
-            <input type="hidden" id="product-id" value="">
-            <label>
-                Nazwa
-                <input type="text" id="product-name" required>
-            </label>
-            <label>
-                Kategoria
-                <select id="product-category-id" required></select>
-            </label>
-            <label>
-                Cena
-                <input type="number" id="product-price" step="0.01" min="0" required>
-            </label>
-            <label>
-                Kolejność
-                <input type="number" id="product-sort-order" value="0">
-            </label>
-            <label>
-                Zdjęcie
-                <input type="file" id="product-photo" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
-            </label>
-            <label>
-                <input type="checkbox" id="product-is-available" checked>
-                Dostępny
-            </label>
-            <label style="flex-basis: 100%;">
-                Opis
-                <textarea id="product-description"></textarea>
-            </label>
-            <button type="submit">Zapisz</button>
-            <button type="button" class="secondary" id="product-form-cancel" style="display:none;">Anuluj edycję</button>
-        </form>
-        <div id="product-status" class="status-msg"></div>
-    </div>
+            <div class="content">
+                <div class="panel" id="section-categories">
+                    <div class="panel-head">
+                        <span class="panel-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16M4 12h16M4 18h9" stroke-linecap="round" /></svg>
+                        </span>
+                        <h2 id="category-form-title">Dodaj kategorię</h2>
+                    </div>
+                    <p class="panel-hint">Kategorie porządkują menu na stronie — kolejność decyduje, w jakiej sekcje pojawiają się dla gości.</p>
+                    <form id="category-form" class="inline-form">
+                        <input type="hidden" id="category-id" value="">
+                        <label>
+                            Nazwa
+                            <input type="text" id="category-name" required>
+                        </label>
+                        <label>
+                            Kolejność
+                            <input type="number" id="category-sort-order" value="0">
+                        </label>
+                        <button type="submit">Zapisz</button>
+                        <button type="button" class="secondary" id="category-form-cancel" style="display:none;">Anuluj edycję</button>
+                    </form>
+                    <div id="category-status" class="status-msg"></div>
 
-    <div class="panel">
-        <h2>Produkty</h2>
-        <div id="products-container"></div>
-    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nazwa</th>
+                                    <th>Kolejność</th>
+                                    <th>Akcje</th>
+                                </tr>
+                            </thead>
+                            <tbody id="categories-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
 
-    <div class="panel" id="section-gallery">
-        <h2 id="gallery-form-title">Dodaj zdjęcie do galerii</h2>
-        <form id="gallery-form" class="inline-form" enctype="multipart/form-data">
-            <input type="hidden" id="gallery-id" value="">
-            <label>
-                Zdjęcie
-                <input type="file" id="gallery-photo" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
-            </label>
-            <label>
-                Podpis
-                <input type="text" id="gallery-caption">
-            </label>
-            <label>
-                Kolejność
-                <input type="number" id="gallery-sort-order" value="0">
-            </label>
-            <button type="submit">Zapisz</button>
-            <button type="button" class="secondary" id="gallery-form-cancel" style="display:none;">Anuluj edycję</button>
-        </form>
-        <div id="gallery-status" class="status-msg"></div>
+                <div class="panel" id="section-products">
+                    <div class="panel-head">
+                        <span class="panel-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 7 12 3 4 7v10l8 4 8-4V7Z" stroke-linejoin="round" /><path d="M4 7l8 4 8-4M12 11v10" stroke-linejoin="round" /></svg>
+                        </span>
+                        <h2 id="product-form-title">Dodaj produkt</h2>
+                    </div>
+                    <p class="panel-hint">Zdjęcie jest opcjonalne — bez niego produkt pokaże się na stronie z ikoną zamiast fotografii.</p>
+                    <form id="product-form" class="inline-form" enctype="multipart/form-data">
+                        <input type="hidden" id="product-id" value="">
+                        <label>
+                            Nazwa
+                            <input type="text" id="product-name" required>
+                        </label>
+                        <label>
+                            Kategoria
+                            <select id="product-category-id" required></select>
+                        </label>
+                        <label>
+                            Cena
+                            <input type="number" id="product-price" step="0.01" min="0" required>
+                        </label>
+                        <label>
+                            Kolejność
+                            <input type="number" id="product-sort-order" value="0">
+                        </label>
+                        <label>
+                            Zdjęcie
+                            <input type="file" id="product-photo" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+                        </label>
+                        <label>
+                            <input type="checkbox" id="product-is-available" checked>
+                            Dostępny
+                        </label>
+                        <label style="flex-basis: 100%;">
+                            Opis
+                            <textarea id="product-description"></textarea>
+                        </label>
+                        <button type="submit">Zapisz</button>
+                        <button type="button" class="secondary" id="product-form-cancel" style="display:none;">Anuluj edycję</button>
+                    </form>
+                    <div id="product-status" class="status-msg"></div>
+                </div>
 
-        <div class="gallery-grid" id="gallery-container"></div>
-    </div>
+                <div class="panel">
+                    <div class="panel-head">
+                        <span class="panel-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 7 12 3 4 7v10l8 4 8-4V7Z" stroke-linejoin="round" /></svg>
+                        </span>
+                        <h2>Produkty</h2>
+                    </div>
+                    <p class="panel-hint">Produkty pogrupowane wg kategorii, tak jak pojawią się w menu na stronie.</p>
+                    <div id="products-container"></div>
+                </div>
 
-    <div class="panel" id="section-events">
-        <h2 id="event-form-title">Dodaj wydarzenie</h2>
-        <form id="event-form" class="inline-form" enctype="multipart/form-data">
-            <input type="hidden" id="event-id" value="">
-            <label>
-                Tytuł
-                <input type="text" id="event-title" required>
-            </label>
-            <label>
-                Data
-                <input type="date" id="event-date" required>
-            </label>
-            <label>
-                Zdjęcie
-                <input type="file" id="event-photo" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
-            </label>
-            <label style="flex-basis: 100%;">
-                Opis
-                <textarea id="event-description"></textarea>
-            </label>
-            <button type="submit">Zapisz</button>
-            <button type="button" class="secondary" id="event-form-cancel" style="display:none;">Anuluj edycję</button>
-        </form>
-        <div id="event-status" class="status-msg"></div>
+                <div class="panel" id="section-gallery">
+                    <div class="panel-head">
+                        <span class="panel-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2" /><circle cx="8.5" cy="9.5" r="1.5" /><path d="m4 17 5-5 4 4 3-3 4 4" stroke-linejoin="round" /></svg>
+                        </span>
+                        <h2 id="gallery-form-title">Dodaj zdjęcie do galerii</h2>
+                    </div>
+                    <p class="panel-hint">Zdjęcia pojawiają się na stronie w kolejności rosnącej wg pola „Kolejność”.</p>
+                    <form id="gallery-form" class="inline-form" enctype="multipart/form-data">
+                        <input type="hidden" id="gallery-id" value="">
+                        <label>
+                            Zdjęcie
+                            <input type="file" id="gallery-photo" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+                        </label>
+                        <label>
+                            Podpis
+                            <input type="text" id="gallery-caption">
+                        </label>
+                        <label>
+                            Kolejność
+                            <input type="number" id="gallery-sort-order" value="0">
+                        </label>
+                        <button type="submit">Zapisz</button>
+                        <button type="button" class="secondary" id="gallery-form-cancel" style="display:none;">Anuluj edycję</button>
+                    </form>
+                    <div id="gallery-status" class="status-msg"></div>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Zdjęcie</th>
-                    <th>Tytuł</th>
-                    <th>Data</th>
-                    <th>Akcje</th>
-                </tr>
-            </thead>
-            <tbody id="events-table-body"></tbody>
-        </table>
-    </div>
+                    <div class="gallery-grid" id="gallery-container"></div>
+                </div>
 
-    <div class="panel" id="section-opinions">
-        <h2 id="opinion-form-title">Dodaj opinię</h2>
-        <form id="opinion-form" class="inline-form">
-            <input type="hidden" id="opinion-id" value="">
-            <label>
-                Autor
-                <input type="text" id="opinion-author" required>
-            </label>
-            <label>
-                Ocena
-                <select id="opinion-rating" required>
-                    <option value="5">5</option>
-                    <option value="4">4</option>
-                    <option value="3">3</option>
-                    <option value="2">2</option>
-                    <option value="1">1</option>
-                </select>
-            </label>
-            <label>
-                <input type="checkbox" id="opinion-is-published">
-                Opublikowana
-            </label>
-            <label style="flex-basis: 100%;">
-                Treść
-                <textarea id="opinion-content" required></textarea>
-            </label>
-            <button type="submit">Zapisz</button>
-            <button type="button" class="secondary" id="opinion-form-cancel" style="display:none;">Anuluj edycję</button>
-        </form>
-        <div id="opinion-status" class="status-msg"></div>
+                <div class="panel" id="section-events">
+                    <div class="panel-head">
+                        <span class="panel-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M8 3v4M16 3v4M3 10h18" stroke-linecap="round" /></svg>
+                        </span>
+                        <h2 id="event-form-title">Dodaj wydarzenie</h2>
+                    </div>
+                    <p class="panel-hint">Wydarzenia wyświetlają się na stronie posortowane po dacie.</p>
+                    <form id="event-form" class="inline-form" enctype="multipart/form-data">
+                        <input type="hidden" id="event-id" value="">
+                        <label>
+                            Tytuł
+                            <input type="text" id="event-title" required>
+                        </label>
+                        <label>
+                            Data
+                            <input type="date" id="event-date" required>
+                        </label>
+                        <label>
+                            Zdjęcie
+                            <input type="file" id="event-photo" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+                        </label>
+                        <label style="flex-basis: 100%;">
+                            Opis
+                            <textarea id="event-description"></textarea>
+                        </label>
+                        <button type="submit">Zapisz</button>
+                        <button type="button" class="secondary" id="event-form-cancel" style="display:none;">Anuluj edycję</button>
+                    </form>
+                    <div id="event-status" class="status-msg"></div>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Autor</th>
-                    <th>Treść</th>
-                    <th>Ocena</th>
-                    <th>Status</th>
-                    <th>Akcje</th>
-                </tr>
-            </thead>
-            <tbody id="opinions-table-body"></tbody>
-        </table>
-    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Zdjęcie</th>
+                                    <th>Tytuł</th>
+                                    <th>Data</th>
+                                    <th>Akcje</th>
+                                </tr>
+                            </thead>
+                            <tbody id="events-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
 
-    <div class="panel" id="section-settings">
-        <h2>Ustawienia strony</h2>
-        <form id="settings-form" class="inline-form">
-            <label style="flex-basis: 100%;">
-                Tekst hero
-                <textarea id="setting-hero-text"></textarea>
-            </label>
-            <label>
-                Telefon kontaktowy
-                <input type="text" id="setting-contact-phone">
-            </label>
-            <label>
-                E-mail kontaktowy
-                <input type="text" id="setting-contact-email">
-            </label>
-            <label>
-                Godziny otwarcia
-                <input type="text" id="setting-opening-hours">
-            </label>
-            <label>
-                Link do Instagrama
-                <input type="text" id="setting-instagram-url">
-            </label>
-            <button type="submit">Zapisz wszystkie ustawienia</button>
-        </form>
-        <div id="settings-status" class="status-msg"></div>
+                <div class="panel" id="section-opinions">
+                    <div class="panel-head">
+                        <span class="panel-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8L12 1.6z" stroke-linejoin="round" /></svg>
+                        </span>
+                        <h2 id="opinion-form-title">Dodaj opinię</h2>
+                    </div>
+                    <p class="panel-hint">Tylko opublikowane opinie są widoczne dla gości na stronie.</p>
+                    <form id="opinion-form" class="inline-form">
+                        <input type="hidden" id="opinion-id" value="">
+                        <label>
+                            Autor
+                            <input type="text" id="opinion-author" required>
+                        </label>
+                        <label>
+                            Ocena
+                            <select id="opinion-rating" required>
+                                <option value="5">5</option>
+                                <option value="4">4</option>
+                                <option value="3">3</option>
+                                <option value="2">2</option>
+                                <option value="1">1</option>
+                            </select>
+                        </label>
+                        <label>
+                            <input type="checkbox" id="opinion-is-published">
+                            Opublikowana
+                        </label>
+                        <label style="flex-basis: 100%;">
+                            Treść
+                            <textarea id="opinion-content" required></textarea>
+                        </label>
+                        <button type="submit">Zapisz</button>
+                        <button type="button" class="secondary" id="opinion-form-cancel" style="display:none;">Anuluj edycję</button>
+                    </form>
+                    <div id="opinion-status" class="status-msg"></div>
+
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Autor</th>
+                                    <th>Treść</th>
+                                    <th>Ocena</th>
+                                    <th>Status</th>
+                                    <th>Akcje</th>
+                                </tr>
+                            </thead>
+                            <tbody id="opinions-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="panel" id="section-settings">
+                    <div class="panel-head">
+                        <span class="panel-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3.2" /><path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l2-1.5-2-3.4-2.3.9a7.7 7.7 0 0 0-2.6-1.5L14 2.5h-4l-.5 2.5a7.7 7.7 0 0 0-2.6 1.5l-2.3-.9-2 3.4 2 1.5a7.6 7.6 0 0 0 0 3l-2 1.5 2 3.4 2.3-.9c.75.66 1.63 1.17 2.6 1.5l.5 2.5h4l.5-2.5a7.7 7.7 0 0 0 2.6-1.5l2.3.9 2-3.4-2-1.5Z" stroke-linejoin="round" /></svg>
+                        </span>
+                        <h2>Ustawienia strony</h2>
+                    </div>
+                    <p class="panel-hint">Te dane trafiają bezpośrednio na stronę główną — hero, sekcję kontaktową i stopkę.</p>
+                    <form id="settings-form" class="inline-form">
+                        <label style="flex-basis: 100%;">
+                            Tekst hero
+                            <textarea id="setting-hero-text"></textarea>
+                        </label>
+                        <label>
+                            Telefon kontaktowy
+                            <input type="text" id="setting-contact-phone">
+                        </label>
+                        <label>
+                            E-mail kontaktowy
+                            <input type="text" id="setting-contact-email">
+                        </label>
+                        <label>
+                            Godziny otwarcia
+                            <input type="text" id="setting-opening-hours">
+                        </label>
+                        <label>
+                            Link do Instagrama
+                            <input type="text" id="setting-instagram-url">
+                        </label>
+                        <button type="submit">Zapisz wszystkie ustawienia</button>
+                    </form>
+                    <div id="settings-status" class="status-msg"></div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>

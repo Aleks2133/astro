@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/../includes/auth_check.php';
+require_once __DIR__ . '/../includes/uploads.php';
 require_once __DIR__ . '/../config.php';
 
 requireAuth();
@@ -133,8 +134,16 @@ function handleDelete(PDO $pdo): void
         return;
     }
 
+    $stmt = $pdo->prepare('SELECT photo_url FROM products WHERE id = :id');
+    $stmt->execute(['id' => $id]);
+    $row = $stmt->fetch();
+
     $stmt = $pdo->prepare('DELETE FROM products WHERE id = :id');
     $stmt->execute(['id' => $id]);
+
+    if ($row && !empty($row['photo_url'])) {
+        deleteUploadedFile($row['photo_url']);
+    }
 
     echo json_encode(['success' => true]);
 }

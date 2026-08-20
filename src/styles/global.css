@@ -1,1 +1,173 @@
 @import "tailwindcss";
+
+/* ─────────────────────────────────────────────────────────────
+   Design tokens — paleta „matcha latte”: jasna zieleń, krem, złoto
+   ───────────────────────────────────────────────────────────── */
+@theme {
+  --color-matcha-50: #f4f8ee;
+  --color-matcha-100: #e6f0d8;
+  --color-matcha-200: #cfe2b4;
+  --color-matcha-300: #b4d18c;
+  --color-matcha-400: #9ac06a;
+  --color-matcha-500: #7ba64c;
+  --color-matcha-600: #5f8639;
+  --color-matcha-700: #48682e;
+  --color-matcha-800: #354d26;
+  --color-matcha-900: #24361c;
+
+  --color-cream-50: #fffdf8;
+  --color-cream-100: #fbf7ee;
+  --color-cream-200: #f4ecdc;
+  --color-cream-300: #e9dcc4;
+
+  --color-clay-400: #c8b8a0;
+  --color-clay-600: #8a7a63;
+  --color-clay-800: #4b4234;
+
+  --color-gold-400: #d9b86a;
+  --color-gold-500: #c19a45;
+
+  --font-display: "Fraunces", "Georgia", ui-serif, serif;
+  --font-sans: "Manrope", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Baza
+   ───────────────────────────────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 6rem;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--color-cream-100);
+  color: var(--color-matcha-900);
+  font-family: var(--font-sans);
+  font-synthesis-weight: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+::selection {
+  background-color: var(--color-matcha-300);
+  color: var(--color-matcha-900);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-matcha-600);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Delikatne ziarno — nadaje „drukowaną”, ciepłą fakturę tła */
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.35;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.22'/%3E%3C/svg%3E");
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Animacje wejścia — sterowane przez IntersectionObserver
+   ───────────────────────────────────────────────────────────── */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.9s var(--ease-soft),
+    transform 0.9s var(--ease-soft);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+
+[data-reveal="scale"] {
+  transform: translateY(24px) scale(0.97);
+}
+
+[data-reveal].is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(0, -22px, 0) scale(1.04); }
+}
+
+@keyframes steam {
+  0% { opacity: 0; transform: translateY(6px) scaleX(0.9); }
+  35% { opacity: 0.7; }
+  100% { opacity: 0; transform: translateY(-38px) scaleX(1.25); }
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
+.animate-float-slow { animation: float-slow 14s ease-in-out infinite; }
+.animate-steam { animation: steam 4.5s ease-out infinite; }
+.animate-marquee { animation: marquee 38s linear infinite; }
+
+.text-shimmer {
+  background: linear-gradient(
+    100deg,
+    var(--color-matcha-800) 20%,
+    var(--color-gold-400) 45%,
+    var(--color-matcha-800) 70%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 7s linear infinite;
+}
+
+/* Szacunek dla ustawień dostępności — zero ruchu, pełna czytelność */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .animate-float-slow,
+  .animate-steam,
+  .animate-marquee,
+  .text-shimmer {
+    animation: none;
+  }
+
+  .text-shimmer {
+    color: var(--color-matcha-800);
+    -webkit-text-fill-color: currentColor;
+  }
+
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Poziome przewijanie sekcji bez widocznego paska */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

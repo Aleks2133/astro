@@ -1,0 +1,139 @@
+---
+interface Props {
+  links: { href: string; label: string }[];
+  phone?: string;
+}
+
+const { links, phone } = Astro.props;
+---
+
+<header
+  id="site-nav"
+  class="fixed inset-x-0 top-0 z-50 transition-all duration-500 ease-[var(--ease-soft)]"
+  data-nav
+>
+  <nav
+    aria-label="Nawigacja główna"
+    class="mx-auto flex max-w-7xl items-center justify-between gap-6 px-5 py-4 sm:px-8 lg:py-6"
+  >
+    <a
+      href="#top"
+      class="group flex items-center gap-3 font-display text-lg tracking-tight text-matcha-900 sm:text-xl"
+    >
+      <span
+        class="grid h-10 w-10 place-items-center rounded-full bg-matcha-500 text-cream-50 shadow-lg shadow-matcha-700/20 transition-transform duration-500 group-hover:rotate-12"
+        aria-hidden="true"
+      >
+        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.6">
+          <path d="M4 9h13a3 3 0 0 1 0 6h-1" stroke-linecap="round" />
+          <path d="M4 9v3a5 5 0 0 0 5 5h3a5 5 0 0 0 5-5V9" stroke-linecap="round" />
+          <path d="M7 5.5c0-1 1-1.2 1-2M11 5.5c0-1 1-1.2 1-2" stroke-linecap="round" />
+        </svg>
+      </span>
+      <span class="font-medium">Pani&nbsp;Matcha</span>
+    </a>
+
+    <ul class="hidden items-center gap-1 lg:flex">
+      {
+        links.map((link) => (
+          <li>
+            <a
+              href={link.href}
+              class="group relative rounded-full px-4 py-2 text-sm font-medium text-matcha-800/80 transition-colors duration-300 hover:text-matcha-900"
+            >
+              <span class="relative z-10">{link.label}</span>
+              <span class="absolute inset-0 scale-75 rounded-full bg-matcha-100 opacity-0 transition-all duration-300 ease-[var(--ease-soft)] group-hover:scale-100 group-hover:opacity-100" />
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="flex items-center gap-2">
+      {
+        phone && (
+          <a
+            href={`tel:${phone.replace(/\s+/g, '')}`}
+            class="hidden rounded-full bg-matcha-800 px-5 py-2.5 text-sm font-medium text-cream-50 shadow-lg shadow-matcha-800/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-matcha-700 hover:shadow-xl sm:inline-block"
+          >
+            Zadzwoń
+          </a>
+        )
+      }
+
+      <button
+        type="button"
+        data-nav-toggle
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+        class="grid h-11 w-11 place-items-center rounded-full border border-matcha-800/15 bg-cream-50/70 text-matcha-900 backdrop-blur transition-colors hover:bg-cream-50 lg:hidden"
+      >
+        <span class="sr-only">Otwórz menu</span>
+        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round" />
+        </svg>
+      </button>
+    </div>
+  </nav>
+
+  <div
+    id="mobile-menu"
+    hidden
+    class="mx-4 mb-3 overflow-hidden rounded-3xl border border-matcha-800/10 bg-cream-50/95 p-3 shadow-2xl shadow-matcha-900/10 backdrop-blur-xl lg:hidden"
+  >
+    <ul class="grid gap-1">
+      {
+        links.map((link) => (
+          <li>
+            <a
+              href={link.href}
+              data-nav-link
+              class="block rounded-2xl px-4 py-3 text-base font-medium text-matcha-900 transition-colors hover:bg-matcha-100"
+            >
+              {link.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</header>
+
+<script is:inline>
+  (() => {
+    const header = document.querySelector('[data-nav]');
+    const toggle = document.querySelector('[data-nav-toggle]');
+    const menu = document.getElementById('mobile-menu');
+    if (!header) return;
+
+    // Tło paska pojawia się dopiero po odjechaniu od hero
+    const onScroll = () => {
+      header.classList.toggle('is-scrolled', window.scrollY > 24);
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+
+    if (!toggle || !menu) return;
+
+    const setOpen = (open) => {
+      menu.hidden = !open;
+      toggle.setAttribute('aria-expanded', String(open));
+    };
+
+    toggle.addEventListener('click', () => setOpen(menu.hidden));
+    menu.querySelectorAll('[data-nav-link]').forEach((link) =>
+      link.addEventListener('click', () => setOpen(false))
+    );
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') setOpen(false);
+    });
+  })();
+</script>
+
+<style>
+  [data-nav].is-scrolled {
+    backdrop-filter: blur(14px);
+    background-color: color-mix(in srgb, var(--color-cream-100) 82%, transparent);
+    box-shadow: 0 10px 40px -24px rgba(36, 54, 28, 0.55);
+  }
+</style>

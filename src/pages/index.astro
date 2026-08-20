@@ -1,17 +1,57 @@
 ---
-import '../styles/global.css';
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import Hero from '../components/Hero.astro';
+import Menu from '../components/Menu.astro';
+import Gallery from '../components/Gallery.astro';
+import Events from '../components/Events.astro';
+import Opinions from '../components/Opinions.astro';
+import Contact from '../components/Contact.astro';
+import Footer from '../components/Footer.astro';
+
+import { fetchSiteData, groupByCategory, mediaUrl } from '../lib/api';
+
+// Dane pobierane w czasie buildu — w przeglądarce nie ma żadnego fetcha.
+// Odświeżenie treści = ponowny build (push / repository_dispatch z panelu).
+const { settings, categories, products, gallery, events, opinions } = await fetchSiteData();
+
+const menuGroups = groupByCategory(categories, products);
+const featured = products.find((p) => p.photo_url) ?? null;
+
+// Nawigacja pokazuje tylko sekcje, które faktycznie mają treść.
+const links = [
+  menuGroups.length > 0 && { href: '#menu', label: 'Menu' },
+  gallery.length > 0 && { href: '#galeria', label: 'Galeria' },
+  events.length > 0 && { href: '#wydarzenia', label: 'Wydarzenia' },
+  opinions.length > 0 && { href: '#opinie', label: 'Opinie' },
+  { href: '#kontakt', label: 'Kontakt' },
+].filter(Boolean) as { href: string; label: string }[];
+
+const description =
+  'Pani Matcha — kawiarnia i matcha bar. Ceremonialna matcha, kawa speciality i domowe wypieki. ' +
+  [settings.opening_hours && `Otwarte ${settings.opening_hours}.`, 'Sprawdź menu i wydarzenia.']
+    .filter(Boolean)
+    .join(' ');
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout
+  title="Pani Matcha — kawiarnia i matcha bar"
+  description={description}
+  settings={settings}
+  image={mediaUrl(featured?.photo_url) ?? mediaUrl(gallery[0]?.photo_url)}
+>
+  <Nav links={links} phone={settings.contact_phone} />
+
+  <main>
+    <Hero heroText={settings.hero_text} openingHours={settings.opening_hours} featured={featured} />
+
+    {menuGroups.length > 0 && <Menu groups={menuGroups} />}
+    {gallery.length > 0 && <Gallery photos={gallery} />}
+    {events.length > 0 && <Events events={events} />}
+    {opinions.length > 0 && <Opinions opinions={opinions} />}
+
+    <Contact settings={settings} />
+  </main>
+
+  <Footer links={links} />
+</Layout>

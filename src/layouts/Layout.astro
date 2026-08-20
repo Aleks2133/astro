@@ -1,0 +1,121 @@
+---
+import '../styles/global.css';
+import { externalUrl, type Settings } from '../lib/api';
+
+interface Props {
+  title: string;
+  description: string;
+  settings: Settings;
+  /** Obrazek do podglądu w social mediach — pełny URL albo ścieżka względna. */
+  image?: string | null;
+}
+
+const { title, description, settings, image } = Astro.props;
+
+const origin = Astro.site ?? new URL('https://panimatcha.pl');
+const canonical = new URL(Astro.url.pathname, origin);
+const ogImage = image ? new URL(image, origin).href : null;
+const instagram = externalUrl(settings.instagram_url);
+
+/** Dane strukturalne — Google pokazuje z nich godziny, telefon i ocenę w wynikach. */
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CafeOrCoffeeShop',
+  name: 'Pani Matcha',
+  description,
+  url: canonical.origin,
+  ...(ogImage ? { image: ogImage } : {}),
+  servesCuisine: ['Kawa', 'Matcha', 'Desery'],
+  priceRange: '$$',
+  ...(settings.contact_phone ? { telephone: settings.contact_phone } : {}),
+  ...(settings.contact_email ? { email: settings.contact_email } : {}),
+  ...(settings.opening_hours ? { openingHours: settings.opening_hours } : {}),
+  ...(instagram ? { sameAs: [instagram] } : {}),
+};
+---
+
+<!doctype html>
+<html lang="pl" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical.href} />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content="#f4f8ee" />
+    <meta name="author" content="Pani Matcha" />
+
+    <!-- Open Graph / Twitter -->
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="pl_PL" />
+    <meta property="og:site_name" content="Pani Matcha" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical.href} />
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    <meta name="twitter:card" content={ogImage ? 'summary_large_image' : 'summary'} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    {ogImage && <meta name="twitter:image" content={ogImage} />}
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <!-- Typografia: display serif + geometryczny sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..700&family=Manrope:wght@300..700&display=swap"
+    />
+    <!-- Zdjęcia serwowane są z domeny panelu -->
+    <link rel="preconnect" href="https://panimatcha.pl" />
+
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />
+  </head>
+
+  <body class="antialiased">
+    <a
+      href="#top"
+      class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-matcha-800 focus:px-5 focus:py-3 focus:text-cream-50"
+    >
+      Przejdź do treści
+    </a>
+
+    <slot />
+
+    <script is:inline>
+      // Odsłanianie sekcji przy scrollu. Inline i bez zależności — kilkaset bajtów,
+      // zero blokowania renderu; przy prefers-reduced-motion CSS i tak pokazuje wszystko.
+      (() => {
+        const items = document.querySelectorAll('[data-reveal]');
+        if (!items.length) return;
+
+        if (
+          !('IntersectionObserver' in window) ||
+          window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        ) {
+          items.forEach((el) => el.classList.add('is-visible'));
+          return;
+        }
+
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (!entry.isIntersecting) return;
+              entry.target.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            });
+          },
+          { rootMargin: '0px 0px -12% 0px', threshold: 0.08 }
+        );
+
+        items.forEach((el) => observer.observe(el));
+      })();
+    </script>
+  </body>
+</html>

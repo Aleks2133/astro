@@ -1,0 +1,101 @@
+---
+import { formatDate, type Opinion } from '../lib/api';
+
+interface Props {
+  opinions: Opinion[];
+}
+
+const { opinions } = Astro.props;
+
+const rated = opinions.filter((o) => Number(o.rating) > 0);
+const average =
+  rated.length > 0
+    ? (rated.reduce((sum, o) => sum + Number(o.rating), 0) / rated.length).toFixed(1).replace('.', ',')
+    : null;
+---
+
+<section id="opinie" class="relative overflow-hidden py-24 sm:py-32">
+  <div class="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-cream-100 via-matcha-50 to-cream-100" aria-hidden="true"></div>
+
+  <div class="mx-auto max-w-7xl px-5 sm:px-8">
+    <header class="mx-auto max-w-2xl text-center">
+      <p data-reveal class="text-xs font-medium uppercase tracking-[0.28em] text-matcha-600">Opinie</p>
+      <h2
+        data-reveal
+        style="--reveal-delay: 100ms"
+        class="mt-4 font-display text-[clamp(2.1rem,4.6vw,3.4rem)] font-light leading-tight tracking-[-0.02em] text-matcha-900"
+      >
+        Mówią o nas goście
+      </h2>
+
+      {
+        average && (
+          <p data-reveal style="--reveal-delay: 180ms" class="mt-6 inline-flex items-center gap-3 rounded-full border border-matcha-800/10 bg-cream-50 px-5 py-2.5 shadow-sm">
+            <span class="font-display text-2xl leading-none text-matcha-800">{average}</span>
+            <span class="flex gap-0.5 text-gold-500" aria-hidden="true">
+              {Array.from({ length: 5 }).map(() => (
+                <svg viewBox="0 0 20 20" class="h-4 w-4" fill="currentColor">
+                  <path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L1.6 7.7l5.8-.8L10 1.6z" />
+                </svg>
+              ))}
+            </span>
+            <span class="text-sm text-clay-600">na podstawie {rated.length} opinii</span>
+          </p>
+        )
+      }
+    </header>
+
+    <div class="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      {
+        opinions.map((opinion, index) => (
+          <figure
+            data-reveal="scale"
+            style={`--reveal-delay: ${Math.min(index, 5) * 80}ms`}
+            class="group relative flex flex-col rounded-3xl border border-matcha-800/8 bg-cream-50 p-7 shadow-sm transition-all duration-500 ease-[var(--ease-soft)] hover:-translate-y-1.5 hover:shadow-xl hover:shadow-matcha-900/10"
+          >
+            <span
+              class="font-display text-6xl leading-none text-matcha-200 transition-colors duration-500 group-hover:text-matcha-300"
+              aria-hidden="true"
+            >
+              &bdquo;
+            </span>
+
+            {Number(opinion.rating) > 0 && (
+              <div
+                class="-mt-4 flex gap-0.5 text-gold-500"
+                role="img"
+                aria-label={`Ocena ${opinion.rating} na 5`}
+              >
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <svg
+                    viewBox="0 0 20 20"
+                    class:list={['h-4 w-4', i < Number(opinion.rating) ? 'text-gold-500' : 'text-clay-400/40']}
+                    fill="currentColor"
+                  >
+                    <path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L1.6 7.7l5.8-.8L10 1.6z" />
+                  </svg>
+                ))}
+              </div>
+            )}
+
+            <blockquote class="mt-4 flex-1 text-[15px] leading-relaxed text-clay-800/85">
+              {opinion.content}
+            </blockquote>
+
+            <figcaption class="mt-6 flex items-center gap-3 border-t border-matcha-800/8 pt-5">
+              <span class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-matcha-500 font-display text-lg text-cream-50">
+                {opinion.author_name.trim().charAt(0).toUpperCase()}
+              </span>
+              <span>
+                <span class="block text-sm font-semibold text-matcha-900">{opinion.author_name}</span>
+                {opinion.created_at && (
+                  <span class="block text-xs text-clay-600">{formatDate(opinion.created_at)}</span>
+                )}
+              </span>
+            </figcaption>
+          </figure>
+        ))
+      }
+    </div>
+  </div>
+</section>

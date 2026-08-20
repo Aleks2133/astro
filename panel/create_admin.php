@@ -8,10 +8,16 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/config.php';
 
-// --- Dane do edycji przed uruchomieniem ---
-$username = 'admin';
-$password = 'zmien_to_haslo';
-// -------------------------------------------
+// --- Dane podawane przy uruchomieniu, nigdy nie zapisuj ich w kodzie ---
+// Uruchom np.: ADMIN_USERNAME=admin ADMIN_PASSWORD='silne_haslo' php create_admin.php
+$username = getenv('ADMIN_USERNAME') ?: 'admin';
+$password = getenv('ADMIN_PASSWORD');
+
+if (!$password) {
+    fwrite(STDERR, "Ustaw zmienną środowiskową ADMIN_PASSWORD przed uruchomieniem skryptu.\n");
+    exit(1);
+}
+// -------------------------------------------------------------------
 
 $passwordHash = password_hash($password, PASSWORD_DEFAULT);
 

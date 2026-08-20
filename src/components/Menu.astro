@@ -6,9 +6,26 @@ interface Props {
 }
 
 const { groups } = Astro.props;
+
+/** Ikony-watermarki dla kart bez zdjęcia — dobierane po nazwie kategorii. */
+function categoryIcon(name: string) {
+  const key = name.toLowerCase();
+  if (key.includes('matcha')) return 'leaf';
+  if (key.includes('kawa') || key.includes('espresso')) return 'cup';
+  if (key.includes('zimne') || key.includes('lemoniad') || key.includes('cold')) return 'glass';
+  return 'pastry';
+}
+
+const slugify = (s: string) =>
+  s
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
 ---
 
-<section id="menu" class="relative py-24 sm:py-32">
+<section id="menu" class="torn-edge relative bg-cream-100 py-24 sm:py-32">
   <div class="mx-auto max-w-7xl px-5 sm:px-8">
     <header class="mx-auto max-w-2xl text-center">
       <p data-reveal class="text-xs font-medium uppercase tracking-[0.28em] text-matcha-600">Karta</p>
@@ -30,74 +47,126 @@ const { groups } = Astro.props;
       )
     }
 
-    <div class="mt-16 space-y-20">
+    {
+      groups.length > 1 && (
+        <nav
+          data-reveal
+          style="--reveal-delay: 240ms"
+          aria-label="Skocz do kategorii"
+          class="no-scrollbar mt-10 flex justify-center gap-2 overflow-x-auto px-2"
+        >
+          {groups.map((g) => (
+            <a
+              href={`#kat-${slugify(g.category.name)}`}
+              class="shrink-0 rounded-full border border-matcha-800/15 bg-cream-50 px-4 py-2 text-sm font-medium capitalize text-matcha-800 transition-colors hover:border-matcha-800/40 hover:bg-matcha-100"
+            >
+              {g.category.name}
+            </a>
+          ))}
+        </nav>
+      )
+    }
+
+    <div class="mt-16 space-y-24">
       {
-        groups.map((group, groupIndex) => (
-          <div>
-            <div data-reveal class="flex items-end gap-5">
-              <h3 class="font-display text-2xl font-normal capitalize tracking-tight text-matcha-800 sm:text-3xl">
-                {group.category.name}
-              </h3>
-              <span class="mb-2 h-px flex-1 bg-gradient-to-r from-matcha-800/25 to-transparent" />
-              <span class="mb-1.5 text-xs uppercase tracking-[0.18em] text-clay-600">
-                {group.products.length}{' '}
-                {group.products.length === 1 ? 'pozycja' : 'pozycji'}
-              </span>
-            </div>
+        groups.map((group, groupIndex) => {
+          const icon = categoryIcon(group.category.name);
 
-            <ul class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {group.products.map((product, index) => {
-                const image = mediaUrl(product.photo_url);
-                const unavailable = Number(product.is_available) === 0;
-
-                return (
-                  <li
-                    data-reveal="scale"
-                    style={`--reveal-delay: ${Math.min(index, 5) * 80}ms`}
-                    class:list={[
-                      'group relative flex flex-col overflow-hidden rounded-3xl border border-matcha-800/8 bg-cream-50 shadow-sm transition-all duration-500 ease-[var(--ease-soft)] hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-matcha-900/10',
-                      unavailable && 'opacity-70',
-                    ]}
+          return (
+            <div id={`kat-${slugify(group.category.name)}`} class="scroll-mt-28">
+              <div data-reveal class="relative flex items-end gap-5">
+                <h3 class="relative font-display text-2xl font-normal capitalize tracking-tight text-matcha-800 sm:text-3xl">
+                  {group.category.name}
+                  <svg
+                    viewBox="0 0 140 12"
+                    class="absolute -bottom-2 left-0 h-3 w-28 text-gold-500/70"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="3"
+                    stroke-linecap="round"
+                    aria-hidden="true"
                   >
-                    {image && (
-                      <div class="relative aspect-[4/3] overflow-hidden bg-matcha-100">
-                        <img
-                          src={image}
-                          alt={product.name}
-                          width="600"
-                          height="450"
-                          loading={groupIndex === 0 && index < 3 ? 'eager' : 'lazy'}
-                          decoding="async"
-                          class="h-full w-full object-cover transition-transform duration-[1.2s] ease-[var(--ease-soft)] group-hover:scale-[1.07]"
-                        />
-                        <div class="absolute inset-0 bg-gradient-to-t from-matcha-900/25 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-                      </div>
-                    )}
+                    <path d="M2 8c20-9 40 6 46-1s26-8 46-1 30 3 44-3" />
+                  </svg>
+                </h3>
+                <span class="mb-2 h-px flex-1 bg-gradient-to-r from-matcha-800/20 to-transparent" />
+                <span class="tilt-right mb-1 inline-block rounded-full bg-matcha-100 px-3 py-1 text-xs uppercase tracking-[0.14em] text-matcha-700">
+                  {group.products.length}{' '}
+                  {group.products.length === 1 ? 'pozycja' : 'pozycji'}
+                </span>
+              </div>
 
-                    <div class="flex flex-1 flex-col p-6">
-                      <div class="flex items-start justify-between gap-4">
-                        <h4 class="font-display text-xl leading-snug text-matcha-900">{product.name}</h4>
-                        <p class="shrink-0 rounded-full bg-matcha-100 px-3 py-1 text-sm font-semibold text-matcha-800">
-                          {formatPrice(product.price)}
-                        </p>
-                      </div>
+              <ul class="mt-9 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {group.products.map((product, index) => {
+                  const image = mediaUrl(product.photo_url);
+                  const unavailable = Number(product.is_available) === 0;
+                  const isSignature = groupIndex === 0 && index === 0;
 
-                      {product.description && (
-                        <p class="mt-3 text-[15px] leading-relaxed text-clay-800/80">{product.description}</p>
+                  return (
+                    <li
+                      data-reveal="scale"
+                      style={`--reveal-delay: ${Math.min(index, 5) * 80}ms`}
+                      class:list={[
+                        'group relative flex flex-col overflow-hidden rounded-2xl border bg-cream-50 shadow-sm transition-all duration-500 ease-[var(--ease-soft)] hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-matcha-900/10',
+                        isSignature ? 'border-gold-500/40 ring-1 ring-gold-400/30' : 'border-matcha-800/8',
+                        unavailable && 'opacity-70',
+                      ]}
+                    >
+                      {isSignature && (
+                        <span class="tilt-left absolute left-4 top-4 z-10 rounded-full bg-gold-500 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-cream-50 shadow">
+                          Poleca się
+                        </span>
                       )}
 
-                      {unavailable && (
-                        <p class="mt-4 inline-flex w-fit items-center gap-2 rounded-full bg-clay-400/25 px-3 py-1 text-xs font-medium uppercase tracking-wider text-clay-800">
-                          Chwilowo niedostępne
-                        </p>
+                      {image ? (
+                        <div class="relative aspect-[4/3] overflow-hidden bg-matcha-100">
+                          <img
+                            src={image}
+                            alt={product.name}
+                            width="600"
+                            height="450"
+                            loading={groupIndex === 0 && index < 3 ? 'eager' : 'lazy'}
+                            decoding="async"
+                            class="h-full w-full object-cover transition-transform duration-[1.2s] ease-[var(--ease-soft)] group-hover:scale-[1.07]"
+                          />
+                          <div class="absolute inset-0 bg-gradient-to-t from-matcha-900/25 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                        </div>
+                      ) : (
+                        <div class="relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-matcha-100/70">
+                          <svg viewBox="0 0 64 64" class="h-16 w-16 text-matcha-800/10 transition-colors duration-500 group-hover:text-matcha-800/20" fill="none" stroke="currentColor" stroke-width="1.5">
+                            {icon === 'leaf' && <path d="M14 50C10 30 22 14 44 12c2 20-10 34-30 38Zm0 0c6-10 14-16 24-20" stroke-linecap="round" stroke-linejoin="round" />}
+                            {icon === 'cup' && <><path d="M14 22h28a8 8 0 0 1 0 16h-2" stroke-linecap="round" /><path d="M14 22v10a14 14 0 0 0 14 14h0a14 14 0 0 0 14-14V22" stroke-linecap="round" /></>}
+                            {icon === 'glass' && <><path d="M18 14h28l-4 36a4 4 0 0 1-4 4H26a4 4 0 0 1-4-4Z" stroke-linejoin="round" /><path d="M20 26h24" /></>}
+                            {icon === 'pastry' && <path d="M10 40c0-14 10-24 22-24s22 10 22 24" stroke-linecap="round" />}
+                          </svg>
+                        </div>
                       )}
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        ))
+
+                      <div class="flex flex-1 flex-col p-6">
+                        <div class="flex items-start justify-between gap-4">
+                          <h4 class="font-display text-xl leading-snug text-matcha-900">{product.name}</h4>
+                          <p class="shrink-0 rounded-full bg-matcha-100 px-3 py-1 text-sm font-semibold text-matcha-800">
+                            {formatPrice(product.price)}
+                          </p>
+                        </div>
+
+                        {product.description && (
+                          <p class="mt-3 text-[15px] leading-relaxed text-clay-800/80">{product.description}</p>
+                        )}
+
+                        {unavailable && (
+                          <p class="mt-4 inline-flex w-fit items-center gap-2 rounded-full bg-clay-400/25 px-3 py-1 text-xs font-medium uppercase tracking-wider text-clay-800">
+                            Chwilowo niedostępne
+                          </p>
+                        )}
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          );
+        })
       }
     </div>
   </div>

@@ -105,7 +105,7 @@ const phoneHref = settings.contact_phone ? `tel:${settings.contact_phone.replace
           <div
             data-reveal
             style="--reveal-delay: 160ms"
-            class="rounded-3xl border border-cream-100/12 bg-cream-50/5 p-7 backdrop-blur transition-colors duration-500 hover:bg-cream-50/10"
+            class="rounded-3xl border border-cream-100/12 bg-cream-50/5 p-7 backdrop-blur transition-colors duration-500 hover:bg-cream-50/10 sm:col-span-2"
           >
             <dt class="flex items-center gap-3 text-xs font-medium uppercase tracking-[0.2em] text-matcha-200">
               <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -117,7 +117,7 @@ const phoneHref = settings.contact_phone ? `tel:${settings.contact_phone.replace
             <dd class="mt-3">
               <a
                 href={`mailto:${settings.contact_email}`}
-                class="font-display text-xl break-all text-cream-50 underline-offset-4 hover:underline"
+                class="font-display text-xl text-cream-50 underline-offset-4 hover:underline [overflow-wrap:anywhere]"
               >
                 {settings.contact_email}
               </a>

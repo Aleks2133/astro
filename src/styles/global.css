@@ -29,6 +29,7 @@
 
   --font-display: "Fraunces", "Georgia", ui-serif, serif;
   --font-sans: "Manrope", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-hand: "Caveat", "Segoe Script", cursive;
 
   --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -170,4 +171,71 @@ body {
 }
 .no-scrollbar::-webkit-scrollbar {
   display: none;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Organiczne kształty i „papierowe” detale — zamiast rozmytych
+   kółek, żeby strona nie wyglądała jak domyślny AI-landing.
+   ───────────────────────────────────────────────────────────── */
+
+/* Nieregularna plama zamiast koła — hero, tło sekcji story */
+.blob-1 { clip-path: path("M429 62C500 111 545 210 523 296C501 382 415 455 320 468C225 481 121 434 66 355C11 276 5 165 66 96C127 27 226 0 313 8C358 12 358 13 429 62Z"); }
+.blob-2 { clip-path: path("M392 40C452 84 470 175 452 253C434 331 380 396 305 425C230 454 134 447 78 393C22 339 6 238 40 160C74 82 158 27 240 20C287 16 332 -4 392 40Z"); }
+
+/* Deseń w kropki — subtelna faktura zamiast pustego tła */
+.dot-grid {
+  background-image: radial-gradient(currentColor 1.4px, transparent 1.4px);
+  background-size: 22px 22px;
+}
+
+/* Kawałek „taśmy” — akcent na zdjęciach/naklejkach */
+.tape {
+  position: absolute;
+  width: 5.5rem;
+  height: 1.75rem;
+  background: color-mix(in srgb, var(--color-gold-400) 55%, var(--color-cream-50));
+  opacity: 0.85;
+  box-shadow: 0 2px 6px rgba(36, 54, 28, 0.15);
+}
+.tape::before,
+.tape::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    115deg,
+    rgba(255, 255, 255, 0.35) 0 2px,
+    transparent 2px 8px
+  );
+}
+
+/* Poszarpana krawędź między sekcjami — jak wydarta kartka */
+.torn-edge {
+  position: relative;
+}
+.torn-edge::before {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 14px;
+  background: inherit;
+  clip-path: polygon(
+    0% 100%, 3% 30%, 7% 90%, 11% 20%, 15% 80%, 19% 10%, 23% 70%, 27% 25%,
+    31% 95%, 35% 15%, 39% 75%, 43% 30%, 47% 85%, 51% 10%, 55% 65%, 59% 20%,
+    63% 90%, 67% 25%, 71% 80%, 75% 15%, 79% 70%, 83% 30%, 87% 95%, 91% 20%,
+    95% 75%, 100% 100%
+  );
+  transform: translateY(-100%);
+}
+
+/* Rotacje do „rozrzuconych” kart — nadpisywane per-element inline */
+.tilt-left { transform: rotate(-2.5deg); }
+.tilt-right { transform: rotate(2deg); }
+
+@media (prefers-reduced-motion: reduce) {
+  .tilt-left,
+  .tilt-right {
+    transform: none;
+  }
 }

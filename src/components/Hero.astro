@@ -14,46 +14,42 @@ const featuredImage = mediaUrl(featured?.photo_url);
 const headline = heroText?.trim() || 'Matcha, która smakuje jak spokojny poranek';
 ---
 
-<section id="top" class="grain relative isolate overflow-hidden pt-28 pb-20 sm:pt-36 lg:pt-44 lg:pb-32">
-  <!-- Tło: miękkie plamy koloru + siatka -->
-  <div class="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
-    <div class="absolute inset-0 bg-gradient-to-b from-matcha-100 via-cream-100 to-cream-100"></div>
+<section id="top" class="relative isolate overflow-hidden pt-28 pb-24 sm:pt-32 lg:pt-36 lg:pb-32">
+  <!-- Tło: kropkowana faktura + jedna organiczna plama, nie symetryczna siatka gradientów -->
+  <div class="pointer-events-none absolute inset-0 -z-10 bg-cream-100" aria-hidden="true">
+    <div class="dot-grid absolute inset-0 text-matcha-800/[0.06]"></div>
     <div
-      class="animate-float-slow absolute -left-24 -top-24 h-[28rem] w-[28rem] rounded-full bg-matcha-300/45 blur-3xl"
-    >
-    </div>
-    <div
-      class="animate-float-slow absolute -right-32 top-24 h-[32rem] w-[32rem] rounded-full bg-gold-400/20 blur-3xl"
-      style="animation-delay: -6s"
+      class="blob-1 animate-float-slow absolute -right-16 top-[-8rem] h-[34rem] w-[34rem] bg-matcha-200/70 sm:-right-8"
     >
     </div>
   </div>
 
-  <div class="mx-auto grid max-w-7xl items-center gap-14 px-5 sm:px-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-20">
-    <div>
+  <div class="mx-auto grid max-w-7xl items-start gap-x-10 gap-y-16 px-5 sm:px-8 lg:grid-cols-12 lg:gap-y-0">
+    <!-- Tekst — celowo zaczepiony wysoko po lewej, nagłówek "wchodzi" pod zdjęcie -->
+    <div class="relative z-10 lg:col-span-7 lg:pt-6">
       <p
         data-reveal
-        class="inline-flex items-center gap-2 rounded-full border border-matcha-800/12 bg-cream-50/70 px-4 py-1.5 text-xs font-medium uppercase tracking-[0.22em] text-matcha-700 backdrop-blur"
+        class="inline-flex items-center gap-2 rounded-full border border-matcha-800/15 bg-cream-50 px-4 py-1.5 text-xs font-medium uppercase tracking-[0.22em] text-matcha-700"
       >
         <span class="h-1.5 w-1.5 rounded-full bg-matcha-500"></span>
-        Kawiarnia &amp; matcha bar
+        Kawiarnia &amp; matcha bar · od 2021
       </p>
 
       <h1
         data-reveal
         style="--reveal-delay: 120ms"
-        class="mt-7 font-display text-[clamp(2.6rem,7vw,4.9rem)] font-light leading-[1.03] tracking-[-0.02em] text-matcha-900"
+        class="mt-6 font-display text-[clamp(2.6rem,8vw,5.6rem)] font-light leading-[0.98] tracking-[-0.025em] text-matcha-900 lg:mr-[-2rem]"
       >
-        <span class="text-shimmer">{headline}</span>
+        {headline}
       </h1>
 
       <p
         data-reveal
         style="--reveal-delay: 240ms"
-        class="mt-7 max-w-xl text-lg leading-relaxed text-clay-800/85 sm:text-xl"
+        class="mt-8 max-w-md text-lg leading-relaxed text-clay-800/85"
       >
-        Ceremonialna matcha, kawa speciality i wypieki prosto z pieca. Miejsce, w którym
-        każdy detal — od ubijania pianki po światło na stole — został przemyślany.
+        Ceremonialna matcha, kawa speciality i wypieki prosto z pieca. Każdy detal —
+        od ubijania pianki po światło na stole — jest tu przemyślany.
       </p>
 
       <div data-reveal style="--reveal-delay: 340ms" class="mt-10 flex flex-wrap items-center gap-4">
@@ -85,22 +81,30 @@ const headline = heroText?.trim() || 'Matcha, która smakuje jak spokojny porane
           </p>
         )
       }
+
+      <!-- Pasek liczb — wypełnia dolną część kolumny tekstowej zamiast pustki -->
+      <dl data-reveal style="--reveal-delay: 520ms" class="mt-14 grid max-w-md grid-cols-3 gap-6 border-t border-matcha-800/10 pt-7">
+        <div>
+          <dt class="font-display text-3xl text-matcha-800">100%</dt>
+          <dd class="mt-1 text-xs uppercase tracking-wider text-clay-600">matcha z Uji</dd>
+        </div>
+        <div>
+          <dt class="font-display text-3xl text-matcha-800">400+</dt>
+          <dd class="mt-1 text-xs uppercase tracking-wider text-clay-600">filiżanek / tydz.</dd>
+        </div>
+        <div>
+          <dt class="font-display text-3xl text-matcha-800">4</dt>
+          <dd class="mt-1 text-xs uppercase tracking-wider text-clay-600">lata na rynku</dd>
+        </div>
+      </dl>
     </div>
 
-    <!-- Wizual -->
-    <div data-reveal="scale" style="--reveal-delay: 200ms" class="relative">
-      <div class="relative mx-auto aspect-[4/5] w-full max-w-md">
-        <div
-          class="absolute -inset-4 rounded-[2.5rem] bg-gradient-to-br from-matcha-200/70 to-gold-400/25 blur-2xl"
-          aria-hidden="true"
-        >
-        </div>
-
-        <div
-          class="relative h-full w-full overflow-hidden rounded-[2rem] border border-cream-50/60 bg-matcha-200 shadow-2xl shadow-matcha-900/25"
-        >
-          {
-            featuredImage ? (
+    <!-- Wizual — kadr z organicznym, nie prostokątnym maskowaniem + naklejka na taśmie -->
+    <div data-reveal="scale" style="--reveal-delay: 220ms" class="relative lg:col-span-5">
+      <div class="relative mx-auto aspect-[4/5] w-full max-w-md lg:mx-0 lg:mt-4">
+        {
+          featuredImage ? (
+            <div class="blob-2 relative h-full w-full overflow-hidden bg-matcha-200 shadow-2xl shadow-matcha-900/25">
               <img
                 src={featuredImage}
                 alt={featured?.name ?? 'Matcha latte w Pani Matcha'}
@@ -110,30 +114,45 @@ const headline = heroText?.trim() || 'Matcha, która smakuje jak spokojny porane
                 decoding="async"
                 class="h-full w-full object-cover transition-transform duration-[1.4s] ease-[var(--ease-soft)] hover:scale-105"
               />
-            ) : (
-              <div class="grid h-full w-full place-items-center bg-gradient-to-br from-matcha-300 to-matcha-600">
-                <svg viewBox="0 0 120 120" class="h-32 w-32 text-cream-100/90" fill="none" stroke="currentColor" stroke-width="3">
-                  <path d="M24 48h64a14 14 0 0 1 0 28h-6" stroke-linecap="round" />
-                  <path d="M24 48v14a26 26 0 0 0 26 26h12a26 26 0 0 0 26-26V48" stroke-linecap="round" />
-                </svg>
+              <div class="pointer-events-none absolute inset-x-0 top-10 flex justify-center gap-3" aria-hidden="true">
+                <span class="animate-steam h-10 w-[3px] rounded-full bg-cream-50/70 blur-[2px]" />
+                <span class="animate-steam h-14 w-[3px] rounded-full bg-cream-50/60 blur-[2px]" style="animation-delay: 1s" />
+                <span class="animate-steam h-10 w-[3px] rounded-full bg-cream-50/70 blur-[2px]" style="animation-delay: 2s" />
               </div>
-            )
-          }
+            </div>
+          ) : (
+            <div class="blob-2 relative h-full w-full overflow-hidden bg-gradient-to-br from-matcha-300 via-matcha-500 to-matcha-700 shadow-2xl shadow-matcha-900/25">
+              {/* Ilustrowany placeholder — do podmiany na zdjęcie w panelu (Produkty → dodaj zdjęcie) */}
+              <div class="dot-grid absolute inset-0 text-cream-50/10"></div>
+              <svg viewBox="0 0 200 220" class="absolute inset-0 h-full w-full p-10" fill="none" aria-hidden="true">
+                <ellipse cx="100" cy="176" rx="58" ry="14" fill="black" opacity="0.08" />
+                <path d="M46 96h108a24 24 0 0 1 0 48h-9" stroke="#fbf7ee" stroke-width="4" stroke-linecap="round" opacity="0.92" />
+                <path d="M46 96v24a44 44 0 0 0 44 44h20a44 44 0 0 0 44-44V96" stroke="#fbf7ee" stroke-width="4" stroke-linecap="round" opacity="0.92" />
+                <path d="M62 96c4-14 16-16 16-28M84 96c4-14 16-16 16-28M106 96c4-14 16-16 16-28" stroke="#fbf7ee" stroke-width="4" stroke-linecap="round" opacity="0.55" />
+                <circle cx="150" cy="40" r="3" fill="#d9b86a" />
+                <circle cx="34" cy="60" r="2.5" fill="#d9b86a" />
+                <circle cx="160" cy="150" r="2.5" fill="#fbf7ee" opacity="0.6" />
+              </svg>
+              <p class="absolute bottom-8 left-0 right-0 text-center font-hand text-2xl text-cream-50/85">
+                zdjęcie w drodze ✎
+              </p>
+            </div>
+          )
+        }
 
-          <!-- Pasemka „pary” nad kubkiem -->
-          <div class="pointer-events-none absolute inset-x-0 top-6 flex justify-center gap-3" aria-hidden="true">
-            <span class="animate-steam h-10 w-[3px] rounded-full bg-cream-50/60 blur-[2px]"></span>
-            <span class="animate-steam h-14 w-[3px] rounded-full bg-cream-50/50 blur-[2px]" style="animation-delay: 1s"></span>
-            <span class="animate-steam h-10 w-[3px] rounded-full bg-cream-50/60 blur-[2px]" style="animation-delay: 2s"></span>
-          </div>
+        <!-- Naklejka na taśmie -->
+        <div class="tilt-left absolute -bottom-7 -left-6 z-10 rounded-sm bg-cream-50 p-4 pt-6 shadow-xl shadow-matcha-900/15 sm:-left-10">
+          <span class="tape -top-3 left-1/2 -translate-x-1/2 rotate-[-3deg]" aria-hidden="true"></span>
+          <p class="font-hand text-2xl leading-none text-matcha-800">pijemy to<br />sami ☕</p>
         </div>
 
-        <!-- Pływająca plakietka -->
+        <!-- Rotowany "stempel" -->
         <div
-          class="animate-float-slow absolute -bottom-6 -left-6 rounded-2xl border border-matcha-800/10 bg-cream-50/95 px-5 py-4 shadow-xl shadow-matcha-900/10 backdrop-blur sm:-left-10"
+          class="tilt-right animate-float-slow absolute -right-4 -top-6 grid h-24 w-24 place-items-center rounded-full border-2 border-dashed border-matcha-700/40 bg-cream-50/95 text-center shadow-lg sm:-right-8"
         >
-          <p class="font-display text-2xl leading-none text-matcha-800">100%</p>
-          <p class="mt-1 text-xs uppercase tracking-[0.18em] text-clay-600">matcha z Uji</p>
+          <span class="font-display text-[11px] uppercase leading-tight tracking-[0.14em] text-matcha-800">
+            świeżo<br />parzone
+          </span>
         </div>
       </div>
     </div>

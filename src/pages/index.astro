@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import Nav from '../components/Nav.astro';
 import Hero from '../components/Hero.astro';
+import Story from '../components/Story.astro';
 import Menu from '../components/Menu.astro';
 import Gallery from '../components/Gallery.astro';
 import Events from '../components/Events.astro';
@@ -20,6 +21,7 @@ const featured = products.find((p) => p.photo_url) ?? null;
 
 // Nawigacja pokazuje tylko sekcje, które faktycznie mają treść.
 const links = [
+  { href: '#o-nas', label: 'O nas' },
   menuGroups.length > 0 && { href: '#menu', label: 'Menu' },
   gallery.length > 0 && { href: '#galeria', label: 'Galeria' },
   events.length > 0 && { href: '#wydarzenia', label: 'Wydarzenia' },
@@ -44,6 +46,7 @@ const description =
 
   <main>
     <Hero heroText={settings.hero_text} openingHours={settings.opening_hours} featured={featured} />
+    <Story />
 
     {menuGroups.length > 0 && <Menu groups={menuGroups} />}
     {gallery.length > 0 && <Gallery photos={gallery} />}

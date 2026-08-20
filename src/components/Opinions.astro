@@ -12,10 +12,17 @@ const average =
   rated.length > 0
     ? (rated.reduce((sum, o) => sum + Number(o.rating), 0) / rated.length).toFixed(1).replace('.', ',')
     : null;
+
+const tilts = ['tilt-left', 'tilt-right', 'tilt-left', '', 'tilt-right'];
+const stickyNoteColors = [
+  'bg-cream-50',
+  'bg-gold-400/25',
+  'bg-matcha-100',
+];
 ---
 
 <section id="opinie" class="relative overflow-hidden py-24 sm:py-32">
-  <div class="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-cream-100 via-matcha-50 to-cream-100" aria-hidden="true"></div>
+  <div class="dot-grid pointer-events-none absolute inset-0 -z-10 text-matcha-800/[0.05]" aria-hidden="true"></div>
 
   <div class="mx-auto max-w-7xl px-5 sm:px-8">
     <header class="mx-auto max-w-2xl text-center">
@@ -45,16 +52,18 @@ const average =
       }
     </header>
 
-    <div class="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+    <div class="mt-16 grid gap-10 sm:gap-8 md:grid-cols-2 lg:grid-cols-3">
       {
         opinions.map((opinion, index) => (
           <figure
             data-reveal="scale"
             style={`--reveal-delay: ${Math.min(index, 5) * 80}ms`}
-            class="group relative flex flex-col rounded-3xl border border-matcha-800/8 bg-cream-50 p-7 shadow-sm transition-all duration-500 ease-[var(--ease-soft)] hover:-translate-y-1.5 hover:shadow-xl hover:shadow-matcha-900/10"
+            class={`group relative flex flex-col p-7 shadow-lg shadow-matcha-900/10 transition-all duration-500 ease-[var(--ease-soft)] hover:z-10 hover:rotate-0 hover:-translate-y-1.5 hover:shadow-2xl ${stickyNoteColors[index % stickyNoteColors.length]} ${tilts[index % tilts.length]}`}
           >
+            <span class="tape -top-3 left-1/2 -translate-x-1/2" aria-hidden="true"></span>
+
             <span
-              class="font-display text-6xl leading-none text-matcha-200 transition-colors duration-500 group-hover:text-matcha-300"
+              class="pointer-events-none absolute right-5 top-4 font-display text-7xl leading-none text-matcha-800/10 select-none"
               aria-hidden="true"
             >
               &bdquo;
@@ -62,7 +71,7 @@ const average =
 
             {Number(opinion.rating) > 0 && (
               <div
-                class="-mt-4 flex gap-0.5 text-gold-500"
+                class="relative flex gap-0.5 text-gold-500"
                 role="img"
                 aria-label={`Ocena ${opinion.rating} na 5`}
               >

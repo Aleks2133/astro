@@ -1,0 +1,97 @@
+---
+/**
+ * Sekcja "Nasza historia" — placeholder tekstowy do podmiany, ale trzymany
+ * w komponencie (nie w panelu), bo panel nie ma na to osobnego pola.
+ * Właściciel może po prostu zmienić treść w tym pliku.
+ */
+
+const values = [
+  {
+    icon: 'leaf',
+    title: 'Prosto od źródła',
+    text: 'Matcha ceremonialna sprowadzana bezpośrednio z Uji, przechowywana w chłodzie.',
+  },
+  {
+    icon: 'hand',
+    title: 'Ręcznie, nie z automatu',
+    text: 'Każda filiżanka ubijana chasenem albo parzona przez baristę, bez pośpiechu.',
+  },
+  {
+    icon: 'home',
+    title: 'Lokalnie i sezonowo',
+    text: 'Wypieki z pobliskiej piekarni, mleko od okolicznych dostawców.',
+  },
+];
+---
+
+<section id="o-nas" class="relative overflow-hidden bg-cream-200 py-24 sm:py-32">
+  <div class="dot-grid pointer-events-none absolute inset-0 text-matcha-800/[0.05]" aria-hidden="true"></div>
+
+  <div class="relative mx-auto max-w-7xl px-5 sm:px-8">
+    <div class="grid gap-16 lg:grid-cols-12 lg:gap-10">
+      <!-- Ilustracja / kolaż -->
+      <div data-reveal="scale" class="relative lg:col-span-5">
+        <div class="relative mx-auto aspect-square w-full max-w-sm">
+          <div class="blob-1 tilt-left absolute inset-0 flex items-center justify-center overflow-hidden bg-gradient-to-br from-gold-400/40 to-matcha-400/50 shadow-xl shadow-matcha-900/10">
+            <svg viewBox="0 0 120 120" class="h-24 w-24 text-matcha-800/50" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M28 55c-3-22 12-38 34-40 4 22-10 40-30 44Z" stroke-linejoin="round" />
+              <path d="M32 59c10-14 26-20 42-18" stroke-linecap="round" />
+              <circle cx="80" cy="30" r="3" fill="currentColor" stroke="none" />
+            </svg>
+          </div>
+
+          <div class="tilt-right absolute -right-2 -top-4 w-32 rotate-3 rounded-sm bg-cream-50 p-2 pb-6 shadow-lg shadow-matcha-900/15 sm:-right-8 sm:w-40">
+            <span class="tape -top-2.5 left-1/2 -translate-x-1/2" aria-hidden="true"></span>
+            <div class="dot-grid flex aspect-square items-center justify-center bg-matcha-100 text-matcha-800/20">
+              <svg viewBox="0 0 48 48" class="h-10 w-10" fill="none" stroke="currentColor" stroke-width="1.6">
+                <rect x="5" y="10" width="38" height="28" rx="3" />
+                <circle cx="17" cy="20" r="3.5" />
+                <path d="m8 33 10-9 8 7 6-6 8 8" />
+              </svg>
+            </div>
+          </div>
+
+          <div class="animate-float-slow absolute -bottom-6 left-2 rounded-full border-2 border-dashed border-matcha-700/30 bg-cream-50/95 px-5 py-4 text-center shadow-lg sm:left-6">
+            <p class="font-hand text-3xl leading-none text-matcha-800">od 2021</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tekst -->
+      <div class="lg:col-span-7 lg:pt-4">
+        <p data-reveal class="text-xs font-medium uppercase tracking-[0.28em] text-matcha-600">Nasza historia</p>
+        <h2
+          data-reveal
+          style="--reveal-delay: 100ms"
+          class="mt-4 font-display text-[clamp(2rem,4.4vw,3.2rem)] font-light leading-tight tracking-[-0.02em] text-matcha-900"
+        >
+          Zaczęło się od jednej miski i uporu
+        </h2>
+        <p data-reveal style="--reveal-delay: 180ms" class="mt-6 max-w-xl text-[17px] leading-relaxed text-clay-800/85">
+          Pani Matcha powstała z jednej obserwacji: w mieście trudno było znaleźć matchę
+          parzoną tak, jak w Kioto — bez pośpiechu, bez proszku z byle jakiej hurtowni.
+          Zaczęliśmy od małego stolika i chasenu, dziś parzymy setki filiżanek tygodniowo,
+          ale zasada się nie zmieniła — jakość ważniejsza niż tempo.
+        </p>
+
+        <ul class="mt-12 grid gap-8 sm:grid-cols-3">
+          {
+            values.map((value, index) => (
+              <li data-reveal="scale" style={`--reveal-delay: ${220 + index * 100}ms`}>
+                <span class="grid h-12 w-12 place-items-center rounded-full bg-matcha-800 text-cream-50">
+                  <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.7">
+                    {value.icon === 'leaf' && <path d="M5 19c-1-8 3-14 12-15 1 8-4 14-11 15Z" stroke-linejoin="round" />}
+                    {value.icon === 'hand' && <path d="M7 12V6a2 2 0 0 1 4 0v4M11 10V4a2 2 0 0 1 4 0v6M15 10V6a2 2 0 0 1 4 0v7c0 4-3 7-7 7s-6-2-7-5l-2-4a2 2 0 0 1 3.4-1.8L7 11" stroke-linecap="round" stroke-linejoin="round" />}
+                    {value.icon === 'home' && <path d="M4 11 12 4l8 7M6 9.5V19a1 1 0 0 0 1 1h4v-6h2v6h4a1 1 0 0 0 1-1V9.5" stroke-linecap="round" stroke-linejoin="round" />}
+                  </svg>
+                </span>
+                <h3 class="mt-4 font-display text-lg text-matcha-900">{value.title}</h3>
+                <p class="mt-2 text-sm leading-relaxed text-clay-800/75">{value.text}</p>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>

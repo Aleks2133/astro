@@ -2,3 +2,12 @@
     Order allow,deny
     Deny from all
 </Files>
+
+# Uploads folder ma własny .htaccess blokujący wykonywanie PHP,
+# ale na wszelki wypadek (podwójne rozszerzenie, źle skonfigurowany serwer)
+# blokujemy też tutaj wykonywanie skryptów wewnątrz uploads/.
+<IfModule mod_php.c>
+    <LocationMatch "^/panel/uploads/">
+        php_flag engine off
+    </LocationMatch>
+</IfModule>

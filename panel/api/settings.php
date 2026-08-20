@@ -4,14 +4,16 @@ declare(strict_types=1);
 require_once __DIR__ . '/../includes/auth_check.php';
 require_once __DIR__ . '/../config.php';
 
-requireAuth();
+$method = $_SERVER['REQUEST_METHOD'];
+if ($method !== 'GET') {
+    requireAuth();
+}
 
 header('Content-Type: application/json; charset=utf-8');
 
 const SETTING_KEYS = ['hero_text', 'contact_phone', 'contact_email', 'opening_hours', 'instagram_url'];
 
 $pdo = getPDO();
-$method = $_SERVER['REQUEST_METHOD'];
 
 switch ($method) {
     case 'GET':

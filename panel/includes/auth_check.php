@@ -8,14 +8,23 @@ declare(strict_types=1);
  */
 function requireAuth(): void
 {
-    if (session_status() === PHP_SESSION_NONE) {
-        session_start();
-    }
-
-    if (!isset($_SESSION['admin_id'])) {
+    if (!isAdminLoggedIn()) {
         http_response_code(401);
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode(['error' => 'Unauthorized']);
         exit;
     }
+}
+
+/**
+ * Sprawdza, czy istnieje aktywna sesja zalogowanego admina panelu,
+ * bez przerywania wykonania (w przeciwieństwie do requireAuth()).
+ */
+function isAdminLoggedIn(): bool
+{
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+
+    return isset($_SESSION['admin_id']);
 }

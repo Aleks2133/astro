@@ -4,12 +4,14 @@ declare(strict_types=1);
 require_once __DIR__ . '/../includes/auth_check.php';
 require_once __DIR__ . '/../config.php';
 
-requireAuth();
+$method = $_SERVER['REQUEST_METHOD'];
+if ($method !== 'GET') {
+    requireAuth();
+}
 
 header('Content-Type: application/json; charset=utf-8');
 
 $pdo = getPDO();
-$method = $_SERVER['REQUEST_METHOD'];
 
 switch ($method) {
     case 'GET':
@@ -31,7 +33,11 @@ switch ($method) {
 
 function handleGet(PDO $pdo): void
 {
-    $stmt = $pdo->query('SELECT * FROM opinions ORDER BY created_at DESC, id DESC');
+    if (isAdminLoggedIn()) {
+        $stmt = $pdo->query('SELECT * FROM opinions ORDER BY created_at DESC, id DESC');
+    } else {
+        $stmt = $pdo->query('SELECT * FROM opinions WHERE is_published = 1 ORDER BY created_at DESC, id DESC');
+    }
     echo json_encode($stmt->fetchAll());
 }
 

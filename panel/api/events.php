@@ -5,12 +5,14 @@ require_once __DIR__ . '/../includes/auth_check.php';
 require_once __DIR__ . '/../includes/uploads.php';
 require_once __DIR__ . '/../config.php';
 
-requireAuth();
+$method = $_SERVER['REQUEST_METHOD'];
+if ($method !== 'GET') {
+    requireAuth();
+}
 
 header('Content-Type: application/json; charset=utf-8');
 
 $pdo = getPDO();
-$method = $_SERVER['REQUEST_METHOD'];
 
 switch ($method) {
     case 'GET':

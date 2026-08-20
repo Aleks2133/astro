@@ -108,6 +108,36 @@ if (!isset($_SESSION['admin_id'])) {
         }
         .badge.available { background: #dcfce7; color: #166534; }
         .badge.unavailable { background: #fee2e2; color: #991b1b; }
+        .gallery-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-top: 12px;
+        }
+        .gallery-item {
+            width: 160px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 8px;
+            text-align: center;
+        }
+        .gallery-item img.thumb-lg {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 4px;
+            background: #eee;
+        }
+        .gallery-item .caption {
+            font-size: 13px;
+            margin: 6px 0;
+            word-break: break-word;
+        }
+        .gallery-item .actions {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+        }
     </style>
 </head>
 <body>
@@ -186,6 +216,30 @@ if (!isset($_SESSION['admin_id'])) {
     <div class="panel">
         <h2>Produkty</h2>
         <div id="products-container"></div>
+    </div>
+
+    <div class="panel">
+        <h2 id="gallery-form-title">Dodaj zdjęcie do galerii</h2>
+        <form id="gallery-form" class="inline-form" enctype="multipart/form-data">
+            <input type="hidden" id="gallery-id" value="">
+            <label>
+                Zdjęcie
+                <input type="file" id="gallery-photo" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+            </label>
+            <label>
+                Podpis
+                <input type="text" id="gallery-caption">
+            </label>
+            <label>
+                Kolejność
+                <input type="number" id="gallery-sort-order" value="0">
+            </label>
+            <button type="submit">Zapisz</button>
+            <button type="button" class="secondary" id="gallery-form-cancel" style="display:none;">Anuluj edycję</button>
+        </form>
+        <div id="gallery-status" class="status-msg"></div>
+
+        <div class="gallery-grid" id="gallery-container"></div>
     </div>
 
     <script>
@@ -495,9 +549,136 @@ if (!isset($_SESSION['admin_id'])) {
             }
         });
 
+        // ---------- Gallery ----------
+
+        var galleryCache = [];
+
+        function loadGallery() {
+            return apiRequest('api/gallery.php').then(function (data) {
+                galleryCache = data;
+                renderGallery();
+            }).catch(function (err) {
+                setStatus('gallery-status', err.message, true);
+            });
+        }
+
+        function renderGallery() {
+            var container = document.getElementById('gallery-container');
+            container.innerHTML = '';
+
+            if (galleryCache.length === 0) {
+                container.innerHTML = '<p>Brak zdjęć w galerii.</p>';
+                return;
+            }
+
+            galleryCache.forEach(function (item) {
+                var div = document.createElement('div');
+                div.className = 'gallery-item';
+
+                var photoHtml = item.photo_url
+                    ? '<img class="thumb-lg" src="' + escapeHtml(item.photo_url) + '" alt="">'
+                    : '<div class="thumb-lg"></div>';
+
+                div.innerHTML =
+                    photoHtml +
+                    '<div class="caption">' + escapeHtml(item.caption || '') + '</div>' +
+                    '<div class="actions">' +
+                        '<button type="button" data-action="edit-gallery" data-id="' + item.id + '">Edytuj</button>' +
+                        '<button type="button" class="danger" data-action="delete-gallery" data-id="' + item.id + '">Usuń</button>' +
+                    '</div>';
+
+                container.appendChild(div);
+            });
+        }
+
+        document.getElementById('gallery-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            var id = document.getElementById('gallery-id').value;
+            var fileInput = document.getElementById('gallery-photo');
+            var file = fileInput.files[0];
+
+            function savePayload(photoUrl) {
+                if (!photoUrl) {
+                    setStatus('gallery-status', 'Zdjęcie jest wymagane.', true);
+                    return Promise.reject(new Error('Zdjęcie jest wymagane.'));
+                }
+
+                var payload = {
+                    photo_url: photoUrl,
+                    caption: document.getElementById('gallery-caption').value.trim(),
+                    sort_order: parseInt(document.getElementById('gallery-sort-order').value, 10) || 0
+                };
+
+                var url = 'api/gallery.php' + (id ? '?id=' + encodeURIComponent(id) : '');
+                var method = id ? 'PUT' : 'POST';
+
+                return apiRequest(url, { method: method, body: JSON.stringify(payload) });
+            }
+
+            var uploadPromise;
+            if (file) {
+                var formData = new FormData();
+                formData.append('photo', file);
+                uploadPromise = apiRequest('api/upload.php', { method: 'POST', body: formData }).then(function (res) {
+                    return res.url;
+                });
+            } else {
+                var existing = id ? galleryCache.find(function (g) { return String(g.id) === String(id); }) : null;
+                uploadPromise = Promise.resolve(existing ? existing.photo_url : '');
+            }
+
+            uploadPromise.then(savePayload).then(function () {
+                setStatus('gallery-status', 'Zapisano zdjęcie.', false);
+                resetGalleryForm();
+                loadGallery();
+            }).catch(function (err) {
+                if (err) setStatus('gallery-status', err.message, true);
+            });
+        });
+
+        document.getElementById('gallery-form-cancel').addEventListener('click', resetGalleryForm);
+
+        function resetGalleryForm() {
+            document.getElementById('gallery-id').value = '';
+            document.getElementById('gallery-caption').value = '';
+            document.getElementById('gallery-sort-order').value = '0';
+            document.getElementById('gallery-photo').value = '';
+            document.getElementById('gallery-form-title').textContent = 'Dodaj zdjęcie do galerii';
+            document.getElementById('gallery-form-cancel').style.display = 'none';
+        }
+
+        document.getElementById('gallery-container').addEventListener('click', function (e) {
+            var btn = e.target.closest('button');
+            if (!btn) return;
+            var id = btn.getAttribute('data-id');
+            var action = btn.getAttribute('data-action');
+
+            if (action === 'edit-gallery') {
+                var item = galleryCache.find(function (g) { return String(g.id) === String(id); });
+                if (!item) return;
+                document.getElementById('gallery-id').value = item.id;
+                document.getElementById('gallery-caption').value = item.caption || '';
+                document.getElementById('gallery-sort-order').value = item.sort_order;
+                document.getElementById('gallery-photo').value = '';
+                document.getElementById('gallery-form-title').textContent = 'Edytuj zdjęcie';
+                document.getElementById('gallery-form-cancel').style.display = 'inline-block';
+                window.scrollTo({ top: document.getElementById('gallery-form').offsetTop - 20, behavior: 'smooth' });
+            } else if (action === 'delete-gallery') {
+                if (!confirm('Na pewno usunąć to zdjęcie z galerii?')) return;
+                apiRequest('api/gallery.php?id=' + encodeURIComponent(id), { method: 'DELETE' }).then(function () {
+                    setStatus('gallery-status', 'Usunięto zdjęcie.', false);
+                    loadGallery();
+                }).catch(function (err) {
+                    setStatus('gallery-status', err.message, true);
+                });
+            }
+        });
+
         // ---------- Init ----------
 
         loadCategories().then(loadProducts);
+        loadGallery();
     })();
     </script>
 </body>

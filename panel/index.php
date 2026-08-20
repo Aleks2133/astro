@@ -138,6 +138,25 @@ if (!isset($_SESSION['admin_id'])) {
             justify-content: center;
             gap: 6px;
         }
+        .section-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+        .section-nav a {
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: #fff;
+            border: 1px solid #ddd;
+            color: #2563eb;
+            text-decoration: none;
+            font-size: 13px;
+        }
+        .section-nav a:hover { background: #eef2ff; }
+        .rating-stars { color: #f59e0b; letter-spacing: 1px; }
+        .badge.published { background: #dcfce7; color: #166534; }
+        .badge.hidden { background: #fee2e2; color: #991b1b; }
     </style>
 </head>
 <body>
@@ -146,7 +165,16 @@ if (!isset($_SESSION['admin_id'])) {
         <p><a href="logout.php">Wyloguj</a></p>
     </div>
 
-    <div class="panel">
+    <nav class="section-nav">
+        <a href="#section-categories">Kategorie</a>
+        <a href="#section-products">Produkty</a>
+        <a href="#section-gallery">Galeria</a>
+        <a href="#section-events">Wydarzenia</a>
+        <a href="#section-opinions">Opinie</a>
+        <a href="#section-settings">Ustawienia</a>
+    </nav>
+
+    <div class="panel" id="section-categories">
         <h2 id="category-form-title">Dodaj kategorię</h2>
         <form id="category-form" class="inline-form">
             <input type="hidden" id="category-id" value="">
@@ -175,7 +203,7 @@ if (!isset($_SESSION['admin_id'])) {
         </table>
     </div>
 
-    <div class="panel">
+    <div class="panel" id="section-products">
         <h2 id="product-form-title">Dodaj produkt</h2>
         <form id="product-form" class="inline-form" enctype="multipart/form-data">
             <input type="hidden" id="product-id" value="">
@@ -218,7 +246,7 @@ if (!isset($_SESSION['admin_id'])) {
         <div id="products-container"></div>
     </div>
 
-    <div class="panel">
+    <div class="panel" id="section-gallery">
         <h2 id="gallery-form-title">Dodaj zdjęcie do galerii</h2>
         <form id="gallery-form" class="inline-form" enctype="multipart/form-data">
             <input type="hidden" id="gallery-id" value="">
@@ -240,6 +268,117 @@ if (!isset($_SESSION['admin_id'])) {
         <div id="gallery-status" class="status-msg"></div>
 
         <div class="gallery-grid" id="gallery-container"></div>
+    </div>
+
+    <div class="panel" id="section-events">
+        <h2 id="event-form-title">Dodaj wydarzenie</h2>
+        <form id="event-form" class="inline-form" enctype="multipart/form-data">
+            <input type="hidden" id="event-id" value="">
+            <label>
+                Tytuł
+                <input type="text" id="event-title" required>
+            </label>
+            <label>
+                Data
+                <input type="date" id="event-date" required>
+            </label>
+            <label>
+                Zdjęcie
+                <input type="file" id="event-photo" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+            </label>
+            <label style="flex-basis: 100%;">
+                Opis
+                <textarea id="event-description"></textarea>
+            </label>
+            <button type="submit">Zapisz</button>
+            <button type="button" class="secondary" id="event-form-cancel" style="display:none;">Anuluj edycję</button>
+        </form>
+        <div id="event-status" class="status-msg"></div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Zdjęcie</th>
+                    <th>Tytuł</th>
+                    <th>Data</th>
+                    <th>Akcje</th>
+                </tr>
+            </thead>
+            <tbody id="events-table-body"></tbody>
+        </table>
+    </div>
+
+    <div class="panel" id="section-opinions">
+        <h2 id="opinion-form-title">Dodaj opinię</h2>
+        <form id="opinion-form" class="inline-form">
+            <input type="hidden" id="opinion-id" value="">
+            <label>
+                Autor
+                <input type="text" id="opinion-author" required>
+            </label>
+            <label>
+                Ocena
+                <select id="opinion-rating" required>
+                    <option value="5">5</option>
+                    <option value="4">4</option>
+                    <option value="3">3</option>
+                    <option value="2">2</option>
+                    <option value="1">1</option>
+                </select>
+            </label>
+            <label>
+                <input type="checkbox" id="opinion-is-published">
+                Opublikowana
+            </label>
+            <label style="flex-basis: 100%;">
+                Treść
+                <textarea id="opinion-content" required></textarea>
+            </label>
+            <button type="submit">Zapisz</button>
+            <button type="button" class="secondary" id="opinion-form-cancel" style="display:none;">Anuluj edycję</button>
+        </form>
+        <div id="opinion-status" class="status-msg"></div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Autor</th>
+                    <th>Treść</th>
+                    <th>Ocena</th>
+                    <th>Status</th>
+                    <th>Akcje</th>
+                </tr>
+            </thead>
+            <tbody id="opinions-table-body"></tbody>
+        </table>
+    </div>
+
+    <div class="panel" id="section-settings">
+        <h2>Ustawienia strony</h2>
+        <form id="settings-form" class="inline-form">
+            <label style="flex-basis: 100%;">
+                Tekst hero
+                <textarea id="setting-hero-text"></textarea>
+            </label>
+            <label>
+                Telefon kontaktowy
+                <input type="text" id="setting-contact-phone">
+            </label>
+            <label>
+                E-mail kontaktowy
+                <input type="text" id="setting-contact-email">
+            </label>
+            <label>
+                Godziny otwarcia
+                <input type="text" id="setting-opening-hours">
+            </label>
+            <label>
+                Link do Instagrama
+                <input type="text" id="setting-instagram-url">
+            </label>
+            <button type="submit">Zapisz wszystkie ustawienia</button>
+        </form>
+        <div id="settings-status" class="status-msg"></div>
     </div>
 
     <script>
@@ -675,10 +814,288 @@ if (!isset($_SESSION['admin_id'])) {
             }
         });
 
+        // ---------- Events ----------
+
+        var eventsCache = [];
+
+        function loadEvents() {
+            return apiRequest('api/events.php').then(function (data) {
+                eventsCache = data;
+                renderEvents();
+            }).catch(function (err) {
+                setStatus('event-status', err.message, true);
+            });
+        }
+
+        function renderEvents() {
+            var tbody = document.getElementById('events-table-body');
+            tbody.innerHTML = '';
+
+            eventsCache.forEach(function (ev) {
+                var tr = document.createElement('tr');
+
+                var photoHtml = ev.photo_url
+                    ? '<img class="thumb" src="' + escapeHtml(ev.photo_url) + '" alt="">'
+                    : '<div class="thumb"></div>';
+
+                tr.innerHTML =
+                    '<td>' + photoHtml + '</td>' +
+                    '<td>' + escapeHtml(ev.title) + '<br><small>' + escapeHtml(ev.description || '') + '</small></td>' +
+                    '<td>' + escapeHtml(ev.event_date) + '</td>' +
+                    '<td class="actions">' +
+                        '<button type="button" data-action="edit-event" data-id="' + ev.id + '">Edytuj</button>' +
+                        '<button type="button" class="danger" data-action="delete-event" data-id="' + ev.id + '">Usuń</button>' +
+                    '</td>';
+                tbody.appendChild(tr);
+            });
+
+            if (eventsCache.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4">Brak wydarzeń.</td></tr>';
+            }
+        }
+
+        document.getElementById('event-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            var id = document.getElementById('event-id').value;
+            var fileInput = document.getElementById('event-photo');
+            var file = fileInput.files[0];
+
+            function savePayload(photoUrl) {
+                var payload = {
+                    title: document.getElementById('event-title').value.trim(),
+                    event_date: document.getElementById('event-date').value,
+                    description: document.getElementById('event-description').value.trim(),
+                    photo_url: photoUrl
+                };
+
+                var url = 'api/events.php' + (id ? '?id=' + encodeURIComponent(id) : '');
+                var method = id ? 'PUT' : 'POST';
+
+                return apiRequest(url, { method: method, body: JSON.stringify(payload) });
+            }
+
+            var uploadPromise;
+            if (file) {
+                var formData = new FormData();
+                formData.append('photo', file);
+                uploadPromise = apiRequest('api/upload.php', { method: 'POST', body: formData }).then(function (res) {
+                    return res.url;
+                });
+            } else {
+                var existing = id ? eventsCache.find(function (ev) { return String(ev.id) === String(id); }) : null;
+                uploadPromise = Promise.resolve(existing ? existing.photo_url : '');
+            }
+
+            uploadPromise.then(savePayload).then(function () {
+                setStatus('event-status', 'Zapisano wydarzenie.', false);
+                resetEventForm();
+                loadEvents();
+            }).catch(function (err) {
+                setStatus('event-status', err.message, true);
+            });
+        });
+
+        document.getElementById('event-form-cancel').addEventListener('click', resetEventForm);
+
+        function resetEventForm() {
+            document.getElementById('event-id').value = '';
+            document.getElementById('event-title').value = '';
+            document.getElementById('event-date').value = '';
+            document.getElementById('event-description').value = '';
+            document.getElementById('event-photo').value = '';
+            document.getElementById('event-form-title').textContent = 'Dodaj wydarzenie';
+            document.getElementById('event-form-cancel').style.display = 'none';
+        }
+
+        document.getElementById('events-table-body').addEventListener('click', function (e) {
+            var btn = e.target.closest('button');
+            if (!btn) return;
+            var id = btn.getAttribute('data-id');
+            var action = btn.getAttribute('data-action');
+
+            if (action === 'edit-event') {
+                var ev = eventsCache.find(function (item) { return String(item.id) === String(id); });
+                if (!ev) return;
+                document.getElementById('event-id').value = ev.id;
+                document.getElementById('event-title').value = ev.title;
+                document.getElementById('event-date').value = ev.event_date;
+                document.getElementById('event-description').value = ev.description || '';
+                document.getElementById('event-photo').value = '';
+                document.getElementById('event-form-title').textContent = 'Edytuj wydarzenie';
+                document.getElementById('event-form-cancel').style.display = 'inline-block';
+                window.scrollTo({ top: document.getElementById('event-form').offsetTop - 20, behavior: 'smooth' });
+            } else if (action === 'delete-event') {
+                if (!confirm('Na pewno usunąć to wydarzenie?')) return;
+                apiRequest('api/events.php?id=' + encodeURIComponent(id), { method: 'DELETE' }).then(function () {
+                    setStatus('event-status', 'Usunięto wydarzenie.', false);
+                    loadEvents();
+                }).catch(function (err) {
+                    setStatus('event-status', err.message, true);
+                });
+            }
+        });
+
+        // ---------- Opinions ----------
+
+        var opinionsCache = [];
+
+        function loadOpinions() {
+            return apiRequest('api/opinions.php').then(function (data) {
+                opinionsCache = data;
+                renderOpinions();
+            }).catch(function (err) {
+                setStatus('opinion-status', err.message, true);
+            });
+        }
+
+        function renderStars(rating) {
+            var n = Number(rating) || 0;
+            return '★★★★★☆☆☆☆☆'.slice(5 - n, 10 - n);
+        }
+
+        function renderOpinions() {
+            var tbody = document.getElementById('opinions-table-body');
+            tbody.innerHTML = '';
+
+            opinionsCache.forEach(function (op) {
+                var tr = document.createElement('tr');
+                var isPublished = !!Number(op.is_published);
+
+                tr.innerHTML =
+                    '<td>' + escapeHtml(op.author_name) + '</td>' +
+                    '<td>' + escapeHtml(op.content) + '</td>' +
+                    '<td><span class="rating-stars">' + renderStars(op.rating) + '</span></td>' +
+                    '<td><span class="badge ' + (isPublished ? 'published' : 'hidden') + '">' +
+                        (isPublished ? 'Opublikowana' : 'Ukryta') + '</span></td>' +
+                    '<td class="actions">' +
+                        '<button type="button" data-action="toggle-opinion" data-id="' + op.id + '" data-published="' + (isPublished ? 1 : 0) + '">' +
+                            (isPublished ? 'Ukryj' : 'Opublikuj') +
+                        '</button>' +
+                        '<button type="button" data-action="edit-opinion" data-id="' + op.id + '">Edytuj</button>' +
+                        '<button type="button" class="danger" data-action="delete-opinion" data-id="' + op.id + '">Usuń</button>' +
+                    '</td>';
+                tbody.appendChild(tr);
+            });
+
+            if (opinionsCache.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5">Brak opinii.</td></tr>';
+            }
+        }
+
+        document.getElementById('opinion-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            var id = document.getElementById('opinion-id').value;
+            var payload = {
+                author_name: document.getElementById('opinion-author').value.trim(),
+                content: document.getElementById('opinion-content').value.trim(),
+                rating: parseInt(document.getElementById('opinion-rating').value, 10),
+                is_published: document.getElementById('opinion-is-published').checked ? 1 : 0
+            };
+
+            var url = 'api/opinions.php' + (id ? '?id=' + encodeURIComponent(id) : '');
+            var method = id ? 'PUT' : 'POST';
+
+            apiRequest(url, { method: method, body: JSON.stringify(payload) }).then(function () {
+                setStatus('opinion-status', 'Zapisano opinię.', false);
+                resetOpinionForm();
+                loadOpinions();
+            }).catch(function (err) {
+                setStatus('opinion-status', err.message, true);
+            });
+        });
+
+        document.getElementById('opinion-form-cancel').addEventListener('click', resetOpinionForm);
+
+        function resetOpinionForm() {
+            document.getElementById('opinion-id').value = '';
+            document.getElementById('opinion-author').value = '';
+            document.getElementById('opinion-content').value = '';
+            document.getElementById('opinion-rating').value = '5';
+            document.getElementById('opinion-is-published').checked = false;
+            document.getElementById('opinion-form-title').textContent = 'Dodaj opinię';
+            document.getElementById('opinion-form-cancel').style.display = 'none';
+        }
+
+        document.getElementById('opinions-table-body').addEventListener('click', function (e) {
+            var btn = e.target.closest('button');
+            if (!btn) return;
+            var id = btn.getAttribute('data-id');
+            var action = btn.getAttribute('data-action');
+
+            if (action === 'edit-opinion') {
+                var op = opinionsCache.find(function (item) { return String(item.id) === String(id); });
+                if (!op) return;
+                document.getElementById('opinion-id').value = op.id;
+                document.getElementById('opinion-author').value = op.author_name;
+                document.getElementById('opinion-content').value = op.content;
+                document.getElementById('opinion-rating').value = op.rating;
+                document.getElementById('opinion-is-published').checked = !!Number(op.is_published);
+                document.getElementById('opinion-form-title').textContent = 'Edytuj opinię';
+                document.getElementById('opinion-form-cancel').style.display = 'inline-block';
+                window.scrollTo({ top: document.getElementById('opinion-form').offsetTop - 20, behavior: 'smooth' });
+            } else if (action === 'toggle-opinion') {
+                var currentlyPublished = btn.getAttribute('data-published') === '1';
+                apiRequest('api/opinions.php?id=' + encodeURIComponent(id), {
+                    method: 'PUT',
+                    body: JSON.stringify({ is_published: currentlyPublished ? 0 : 1 })
+                }).then(function () {
+                    setStatus('opinion-status', 'Zaktualizowano status opinii.', false);
+                    loadOpinions();
+                }).catch(function (err) {
+                    setStatus('opinion-status', err.message, true);
+                });
+            } else if (action === 'delete-opinion') {
+                if (!confirm('Na pewno usunąć tę opinię?')) return;
+                apiRequest('api/opinions.php?id=' + encodeURIComponent(id), { method: 'DELETE' }).then(function () {
+                    setStatus('opinion-status', 'Usunięto opinię.', false);
+                    loadOpinions();
+                }).catch(function (err) {
+                    setStatus('opinion-status', err.message, true);
+                });
+            }
+        });
+
+        // ---------- Settings ----------
+
+        function loadSettings() {
+            return apiRequest('api/settings.php').then(function (data) {
+                document.getElementById('setting-hero-text').value = data.hero_text || '';
+                document.getElementById('setting-contact-phone').value = data.contact_phone || '';
+                document.getElementById('setting-contact-email').value = data.contact_email || '';
+                document.getElementById('setting-opening-hours').value = data.opening_hours || '';
+                document.getElementById('setting-instagram-url').value = data.instagram_url || '';
+            }).catch(function (err) {
+                setStatus('settings-status', err.message, true);
+            });
+        }
+
+        document.getElementById('settings-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            var payload = {
+                hero_text: document.getElementById('setting-hero-text').value.trim(),
+                contact_phone: document.getElementById('setting-contact-phone').value.trim(),
+                contact_email: document.getElementById('setting-contact-email').value.trim(),
+                opening_hours: document.getElementById('setting-opening-hours').value.trim(),
+                instagram_url: document.getElementById('setting-instagram-url').value.trim()
+            };
+
+            apiRequest('api/settings.php', { method: 'POST', body: JSON.stringify(payload) }).then(function () {
+                setStatus('settings-status', 'Zapisano ustawienia.', false);
+            }).catch(function (err) {
+                setStatus('settings-status', err.message, true);
+            });
+        });
+
         // ---------- Init ----------
 
         loadCategories().then(loadProducts);
         loadGallery();
+        loadEvents();
+        loadOpinions();
+        loadSettings();
     })();
     </script>
 </body>

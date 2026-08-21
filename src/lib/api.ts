@@ -11,8 +11,15 @@
 
 /** Domena panelu — nadpisywalna zmienną środowiskową na czas buildu. */
 export const API_BASE = (
-  import.meta.env.PUBLIC_API_BASE ?? 'https://panimatcha.pl'
+  import.meta.env.PUBLIC_API_BASE ?? 'https://novamarka.pl'
 ).replace(/\/$/, '');
+
+/**
+ * Identyfikator panimatcha.pl w wielotenantowym systemie novamarka —
+ * panel jednej instalacji obsługuje teraz treści wielu stron, rozróżniane
+ * właśnie po tym parametrze. Dokładany do każdego zapytania GET.
+ */
+const SITE_ID = 2;
 
 export interface Category {
   id: number;
@@ -77,7 +84,8 @@ const EMPTY_SETTINGS: Settings = {
  * sekwencyjnie (patrz `fetchSiteData`) i dokładamy jedną próbę ponowienia.
  */
 async function getJSON<T>(endpoint: string, fallback: T, attempts = 2): Promise<T> {
-  const url = `${API_BASE}/panel/api/${endpoint}`;
+  const separator = endpoint.includes('?') ? '&' : '?';
+  const url = `${API_BASE}/panel/api/${endpoint}${separator}site_id=${SITE_ID}`;
 
   for (let attempt = 1; attempt <= attempts; attempt++) {
     try {

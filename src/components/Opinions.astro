@@ -13,98 +13,209 @@ const average =
     ? (rated.reduce((sum, o) => sum + Number(o.rating), 0) / rated.length).toFixed(1).replace('.', ',')
     : null;
 
-const tilts = ['tilt-left', 'tilt-right', 'tilt-left', '', 'tilt-right'];
-const stickyNoteColors = [
-  'bg-cream-50',
-  'bg-gold-400/25',
-  'bg-matcha-100',
-];
+const stickyNoteColors = ['bg-cream-50', 'bg-gold-400/20', 'bg-matcha-100'];
+const showArrows = opinions.length > 1;
 ---
 
 <section id="opinie" class="relative overflow-hidden py-24 sm:py-32">
   <div class="dot-grid pointer-events-none absolute inset-0 -z-10 text-matcha-800/[0.05]" aria-hidden="true"></div>
 
   <div class="mx-auto max-w-7xl px-5 sm:px-8">
-    <header class="mx-auto max-w-2xl text-center">
-      <p data-reveal class="text-xs font-medium uppercase tracking-[0.28em] text-matcha-600">Opinie</p>
-      <h2
-        data-reveal
-        style="--reveal-delay: 100ms"
-        class="mt-4 font-display text-[clamp(2.1rem,4.6vw,3.4rem)] font-light leading-tight tracking-[-0.02em] text-matcha-900"
-      >
-        Mówią o nas goście
-      </h2>
+    <header class="flex flex-wrap items-end justify-between gap-6">
+      <div class="mx-auto max-w-2xl text-center sm:mx-0 sm:text-left">
+        <p data-reveal class="text-xs font-medium uppercase tracking-[0.28em] text-matcha-600">Opinie</p>
+        <h2
+          data-reveal
+          style="--reveal-delay: 100ms"
+          class="mt-4 font-display text-[clamp(2.1rem,4.6vw,3.4rem)] font-light leading-tight tracking-[-0.02em] text-matcha-900"
+        >
+          Mówią o nas goście
+        </h2>
+
+        {
+          average && (
+            <p data-reveal style="--reveal-delay: 180ms" class="mt-6 inline-flex items-center gap-3 rounded-full border border-matcha-800/10 bg-cream-50 px-5 py-2.5 shadow-sm">
+              <span class="font-display text-2xl leading-none text-matcha-800">{average}</span>
+              <span class="flex gap-0.5 text-gold-500" aria-hidden="true">
+                {Array.from({ length: 5 }).map(() => (
+                  <svg viewBox="0 0 20 20" class="h-4 w-4" fill="currentColor">
+                    <path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L1.6 7.7l5.8-.8L10 1.6z" />
+                  </svg>
+                ))}
+              </span>
+              <span class="text-sm text-clay-600">na podstawie {rated.length} opinii</span>
+            </p>
+          )
+        }
+      </div>
 
       {
-        average && (
-          <p data-reveal style="--reveal-delay: 180ms" class="mt-6 inline-flex items-center gap-3 rounded-full border border-matcha-800/10 bg-cream-50 px-5 py-2.5 shadow-sm">
-            <span class="font-display text-2xl leading-none text-matcha-800">{average}</span>
-            <span class="flex gap-0.5 text-gold-500" aria-hidden="true">
-              {Array.from({ length: 5 }).map(() => (
-                <svg viewBox="0 0 20 20" class="h-4 w-4" fill="currentColor">
-                  <path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L1.6 7.7l5.8-.8L10 1.6z" />
-                </svg>
-              ))}
-            </span>
-            <span class="text-sm text-clay-600">na podstawie {rated.length} opinii</span>
-          </p>
+        showArrows && (
+          <div data-reveal style="--reveal-delay: 220ms" class="hidden shrink-0 gap-2 sm:flex" data-opinions-arrows>
+            <button
+              type="button"
+              data-opinions-prev
+              aria-label="Poprzednie opinie"
+              class="grid h-11 w-11 place-items-center rounded-full border border-matcha-800/15 bg-cream-50 text-matcha-800 transition-colors duration-300 hover:bg-matcha-100 disabled:pointer-events-none disabled:opacity-30"
+            >
+              <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 6l-6 6 6 6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            </button>
+            <button
+              type="button"
+              data-opinions-next
+              aria-label="Następne opinie"
+              class="grid h-11 w-11 place-items-center rounded-full border border-matcha-800/15 bg-cream-50 text-matcha-800 transition-colors duration-300 hover:bg-matcha-100 disabled:pointer-events-none disabled:opacity-30"
+            >
+              <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            </button>
+          </div>
         )
       }
     </header>
 
-    <div class="mt-16 grid gap-10 sm:gap-8 md:grid-cols-2 lg:grid-cols-3">
-      {
-        opinions.map((opinion, index) => (
-          <figure
-            data-reveal="scale"
-            style={`--reveal-delay: ${Math.min(index, 5) * 80}ms`}
-            class={`group relative flex flex-col p-7 shadow-lg shadow-matcha-900/10 transition-all duration-500 ease-[var(--ease-soft)] hover:z-10 hover:rotate-0 hover:-translate-y-1.5 hover:shadow-2xl ${stickyNoteColors[index % stickyNoteColors.length]} ${tilts[index % tilts.length]}`}
-          >
-            <span class="tape -top-3 left-1/2 -translate-x-1/2" aria-hidden="true"></span>
-
-            <span
-              class="pointer-events-none absolute right-5 top-4 font-display text-7xl leading-none text-matcha-800/10 select-none"
-              aria-hidden="true"
+    <div
+      data-reveal="scale"
+      style="--reveal-delay: 260ms"
+      class="relative mt-14"
+    >
+      <div
+        data-opinions-track
+        tabindex="0"
+        role="region"
+        aria-label="Opinie gości — przewijalna lista"
+        class="no-scrollbar flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-pl-1 pb-3 pt-2"
+      >
+        {
+          opinions.map((opinion, index) => (
+            <figure
+              data-opinions-card
+              class={`group relative flex w-[82%] shrink-0 snap-start flex-col p-7 shadow-lg shadow-matcha-900/10 transition-shadow duration-500 hover:shadow-2xl sm:w-[46%] lg:w-[31%] ${stickyNoteColors[index % stickyNoteColors.length]}`}
             >
-              &bdquo;
-            </span>
+              <span class="tape -top-3 left-1/2 -translate-x-1/2" aria-hidden="true" />
 
-            {Number(opinion.rating) > 0 && (
-              <div
-                class="relative flex gap-0.5 text-gold-500"
-                role="img"
-                aria-label={`Ocena ${opinion.rating} na 5`}
+              <span
+                class="pointer-events-none absolute right-5 top-4 font-display text-7xl leading-none text-matcha-800/10 select-none"
+                aria-hidden="true"
               >
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <svg
-                    viewBox="0 0 20 20"
-                    class:list={['h-4 w-4', i < Number(opinion.rating) ? 'text-gold-500' : 'text-clay-400/40']}
-                    fill="currentColor"
-                  >
-                    <path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L1.6 7.7l5.8-.8L10 1.6z" />
-                  </svg>
-                ))}
-              </div>
-            )}
-
-            <blockquote class="mt-4 flex-1 text-[15px] leading-relaxed text-clay-800/85">
-              {opinion.content}
-            </blockquote>
-
-            <figcaption class="mt-6 flex items-center gap-3 border-t border-matcha-800/8 pt-5">
-              <span class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-matcha-500 font-display text-lg text-cream-50">
-                {opinion.author_name.trim().charAt(0).toUpperCase()}
+                &bdquo;
               </span>
-              <span>
-                <span class="block text-sm font-semibold text-matcha-900">{opinion.author_name}</span>
-                {opinion.created_at && (
-                  <span class="block text-xs text-clay-600">{formatDate(opinion.created_at)}</span>
-                )}
-              </span>
-            </figcaption>
-          </figure>
-        ))
+
+              {Number(opinion.rating) > 0 && (
+                <div
+                  class="relative flex gap-0.5 text-gold-500"
+                  role="img"
+                  aria-label={`Ocena ${opinion.rating} na 5`}
+                >
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <svg
+                      viewBox="0 0 20 20"
+                      class:list={['h-4 w-4', i < Number(opinion.rating) ? 'text-gold-500' : 'text-clay-400/40']}
+                      fill="currentColor"
+                    >
+                      <path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L1.6 7.7l5.8-.8L10 1.6z" />
+                    </svg>
+                  ))}
+                </div>
+              )}
+
+              <blockquote class="relative mt-4 flex-1 text-[15px] leading-relaxed text-clay-800/85">
+                {opinion.content}
+              </blockquote>
+
+              <figcaption class="relative mt-6 flex items-center gap-3 border-t border-matcha-800/8 pt-5">
+                <span class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-matcha-500 font-display text-lg text-cream-50">
+                  {opinion.author_name.trim().charAt(0).toUpperCase()}
+                </span>
+                <span>
+                  <span class="block text-sm font-semibold text-matcha-900">{opinion.author_name}</span>
+                  {opinion.created_at && (
+                    <span class="block text-xs text-clay-600">{formatDate(opinion.created_at)}</span>
+                  )}
+                </span>
+              </figcaption>
+            </figure>
+          ))
+        }
+      </div>
+
+      {
+        showArrows && (
+          <div class="mt-8 flex justify-center gap-2" data-opinions-dots aria-hidden="true" />
+        )
       }
     </div>
   </div>
 </section>
+
+<script is:inline>
+  (() => {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const scrollMode = reduceMotion ? 'auto' : 'smooth';
+
+    document.querySelectorAll('[data-opinions-track]').forEach((track) => {
+      const section = track.closest('section');
+      const cards = Array.from(track.querySelectorAll('[data-opinions-card]'));
+      if (cards.length === 0) return;
+
+      const prevBtn = section.querySelector('[data-opinions-prev]');
+      const nextBtn = section.querySelector('[data-opinions-next]');
+      const dotsWrap = section.querySelector('[data-opinions-dots]');
+
+      let dots = [];
+      if (dotsWrap) {
+        dots = cards.map((_, i) => {
+          const dot = document.createElement('button');
+          dot.type = 'button';
+          dot.setAttribute('aria-label', `Przejdź do opinii ${i + 1}`);
+          dot.className = 'h-2 w-2 rounded-full bg-matcha-800/20 transition-all duration-300';
+          dot.addEventListener('click', () => {
+            cards[i].scrollIntoView({ behavior: scrollMode, inline: 'start', block: 'nearest' });
+          });
+          dotsWrap.appendChild(dot);
+          return dot;
+        });
+      }
+
+      function setActive(index) {
+        dots.forEach((dot, i) => {
+          const active = i === index;
+          dot.classList.toggle('bg-matcha-800', active);
+          dot.classList.toggle('w-6', active);
+          dot.classList.toggle('bg-matcha-800/20', !active);
+        });
+      }
+
+      function updateArrows() {
+        if (!prevBtn || !nextBtn) return;
+        const maxScroll = track.scrollWidth - track.clientWidth - 2;
+        prevBtn.disabled = track.scrollLeft <= 2;
+        nextBtn.disabled = track.scrollLeft >= maxScroll;
+      }
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            setActive(cards.indexOf(entry.target));
+          });
+        },
+        { root: track, threshold: 0.6 }
+      );
+      cards.forEach((card) => observer.observe(card));
+
+      track.addEventListener('scroll', updateArrows, { passive: true });
+      updateArrows();
+      setActive(0);
+
+      function scrollByCards(direction) {
+        const card = cards[0];
+        const gap = parseFloat(getComputedStyle(track).columnGap || '0');
+        const distance = (card.getBoundingClientRect().width + gap) * direction;
+        track.scrollBy({ left: distance, behavior: scrollMode });
+      }
+
+      prevBtn?.addEventListener('click', () => scrollByCards(-1));
+      nextBtn?.addEventListener('click', () => scrollByCards(1));
+    });
+  })();
+</script>

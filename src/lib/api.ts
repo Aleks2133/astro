@@ -147,6 +147,21 @@ export function formatDate(date: string): string {
   }).format(parsed);
 }
 
+/**
+ * Polska odmiana liczebnikowa: 1 → forma pojedyncza, 2-4 (poza 12-14) → forma
+ * "kilka", reszta (5+, 12-14, 22-24…) → forma dopełniaczowa.
+ * np. pluralPL(1,'pozycja','pozycje','pozycji') → "pozycja", (3,…) → "pozycje", (5,…) → "pozycji"
+ */
+export function pluralPL(count: number, one: string, few: string, many: string): string {
+  if (count === 1) return one;
+  const lastDigit = count % 10;
+  const lastTwoDigits = count % 100;
+  if (lastDigit >= 2 && lastDigit <= 4 && !(lastTwoDigits >= 12 && lastTwoDigits <= 14)) {
+    return few;
+  }
+  return many;
+}
+
 /** Krótka forma na "kafelek" daty: { day: "22", month: "sie" } */
 export function dateBadge(date: string): { day: string; month: string } | null {
   const parsed = new Date(date);

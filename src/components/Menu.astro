@@ -1,5 +1,5 @@
 ---
-import { formatPrice, mediaUrl, type Category, type Product } from '../lib/api';
+import { formatPrice, mediaUrl, pluralPL, type Category, type Product } from '../lib/api';
 
 interface Props {
   groups: { category: Category; products: Product[] }[];
@@ -16,9 +16,15 @@ function categoryIcon(name: string) {
   return 'pastry';
 }
 
+/**
+ * "ł" i "Ł" nie rozkładają się przez NFD jak inne polskie znaki diakrytyczne
+ * (ą, ć, ę, ń, ó, ś, ź, ż), więc trzeba je zmapować ręcznie przed usunięciem
+ * pozostałych akcentów — inaczej trafiają do "-" i psują czytelność kotwicy.
+ */
 const slugify = (s: string) =>
   s
     .toLowerCase()
+    .replace(/ł/g, 'l')
     .normalize('NFD')
     .replace(/[̀-ͯ]/g, '')
     .replace(/[^a-z0-9]+/g, '-')
@@ -92,7 +98,7 @@ const slugify = (s: string) =>
                 <span class="mb-2 h-px flex-1 bg-gradient-to-r from-matcha-800/20 to-transparent" />
                 <span class="tilt-right mb-1 inline-block rounded-full bg-matcha-100 px-3 py-1 text-xs uppercase tracking-[0.14em] text-matcha-700">
                   {group.products.length}{' '}
-                  {group.products.length === 1 ? 'pozycja' : 'pozycji'}
+                  {pluralPL(group.products.length, 'pozycja', 'pozycje', 'pozycji')}
                 </span>
               </div>
 
